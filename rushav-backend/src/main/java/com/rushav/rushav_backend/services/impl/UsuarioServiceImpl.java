@@ -11,53 +11,78 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository repo;
 
-    public UsuarioServiceImpl(UsuarioRepository repo) { 
-        this.repo = repo; 
+    public UsuarioServiceImpl(UsuarioRepository repo) {
+        this.repo = repo;
     }
 
-    @Override 
-    public List<Usuario> listar() { 
-        return repo.findAll(); 
+    @Override
+    public List<Usuario> listar() {
+        return repo.findAll();
     }
 
-    @Override 
-    public Optional<Usuario> buscarPorId(Long id) { 
-        return repo.findById(id); 
+    @Override
+    public Optional<Usuario> buscarPorId(Long id) {
+        return repo.findById(id);
     }
 
-    @Override 
-    public Optional<Usuario> buscarPorEmail(String email) { 
-        return repo.findByEmail(email); 
+    @Override
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return repo.findByEmail(email);
     }
-    
+
     @Override
     public Usuario crear(Usuario u) {
         // SIN ENCRIPTACIÓN - guarda password directo
         if (u.getRol() == null) u.setRol("cliente");
+        // Los campos region y comuna se guardan si vienen en 'u'
         return repo.save(u);
     }
 
     @Override
-    public Usuario actualizar(Long id, Usuario u) {
-        return repo.findById(id).map(ex -> {
-            ex.setNombre(u.getNombre());
-            ex.setEmail(u.getEmail());
-            if (u.getPassword() != null && !u.getPassword().isBlank()) {
-                ex.setPassword(u.getPassword()); // Guarda directo
+    public Usuario actualizar(Long id, Usuario usuarioActualizado) { // Renombrado 'u' para claridad
+        // Busca el usuario existente por ID. Si no existe, lanza excepción.
+        return repo.findById(id).map(usuarioExistente -> { // 'ex' renombrado a 'usuarioExistente'
+            
+            System.out.println("Actualizando usuario ID: " + id); // Log inicio
+            System.out.println("Datos recibidos: " + usuarioActualizado); // Log datos entrantes (puede ser verboso)
+
+            // Actualiza los campos del usuario existente ('ex') con los datos recibidos ('u')
+            usuarioExistente.setNombre(usuarioActualizado.getNombre());
+            usuarioExistente.setEmail(usuarioActualizado.getEmail()); // <-- Actualiza el email
+            usuarioExistente.setRol(usuarioActualizado.getRol());
+            usuarioExistente.setRegion(usuarioActualizado.getRegion());
+            usuarioExistente.setComuna(usuarioActualizado.getComuna());
+            usuarioExistente.setActivo(usuarioActualizado.isActivo());
+
+            // --- Lógica Clave para Contraseña ---
+            // Verifica si en los datos recibidos ('u') viene una contraseña nueva y si no está vacía
+            if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isBlank()) {
+                System.out.println("-> Se recibió nueva contraseña. Actualizando..."); // Log
+                // Si SÍ viene una nueva, actualiza la contraseña en el usuario existente ('ex')
+                usuarioExistente.setPassword(usuarioActualizado.getPassword()); // Guarda directo (texto plano)
+            } else {
+                System.out.println("-> No se recibió nueva contraseña o estaba vacía. Contraseña existente NO se modifica."); // Log
+                // Si NO viene una nueva (es null o vacía), simplemente NO se hace nada,
+                // por lo que 'usuarioExistente' MANTIENE su contraseña original de la base de datos.
             }
-            ex.setRol(u.getRol());
-            ex.setActivo(u.isActivo());
-            return repo.save(ex);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            // --- Fin Lógica Contraseña ---
+
+            // Guarda la entidad 'usuarioExistente' (con todos los campos actualizados,
+            // incluyendo la contraseña si correspondía) en la base de datos
+            System.out.println("Guardando usuario actualizado...");
+            return repo.save(usuarioExistente);
+
+        // Mensaje de error si findById no encontró al usuario
+        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id)); 
     }
 
-    @Override 
-    public void eliminar(Long id) { 
-        repo.deleteById(id); 
+    @Override
+    public void eliminar(Long id) {
+        repo.deleteById(id);
     }
 
-    @Override 
-    public long contarTotalUsuarios() { 
-        return repo.count(); 
+    @Override
+    public long contarTotalUsuarios() {
+        return repo.count();
     }
 }

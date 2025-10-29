@@ -2,6 +2,8 @@ package com.rushav.rushav_backend.controllers;
 
 import com.rushav.rushav_backend.services.ProductoService;
 import com.rushav.rushav_backend.services.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/dashboard")
 @CrossOrigin(origins = "*")
+@Tag(name = "4. Dashboard", description = "Estadísticas y métricas del sistema")
 public class DashboardController {
     private final ProductoService productoService;
     private final UsuarioService usuarioService;
@@ -19,6 +22,7 @@ public class DashboardController {
         this.usuarioService = usuarioService;
     }
 
+    @Operation(summary = "Obtener estadísticas", description = "Retorna métricas generales del sistema para el dashboard")
     @GetMapping("/estadisticas")
     public ResponseEntity<Map<String, Object>> getEstadisticas() {
         Map<String, Object> stats = new HashMap<>();

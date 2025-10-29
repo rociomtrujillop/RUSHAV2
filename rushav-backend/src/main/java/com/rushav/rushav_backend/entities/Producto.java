@@ -3,38 +3,49 @@ package com.rushav.rushav_backend.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.annotations.CreationTimestamp;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "productos")
-public class Producto {
+@Schema(description = "Entidad que representa un producto en el catálogo")public class Producto {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank 
     @Size(max = 200)
+    @Schema(description = "Nombre del producto", example = "Polera Heartstruck", required = true)
     private String nombre;
 
     @Size(max = 1000)
+    @Schema(description = "Descripción detallada del producto", example = "Polera oversize con estampado exclusivo")
     private String descripcion;
 
     @PositiveOrZero
+    @Schema(description = "Precio del producto en pesos chilenos", example = "9990")
     private int precio;
 
     @PositiveOrZero
+    @Schema(description = "Cantidad disponible en inventario", example = "20")
     private int stock;
 
+    @Schema(description = "Estado activo/inactivo del producto", example = "true")
     private boolean activo = true;
 
     @Column(length = 1000)
+    @Schema(description = "URLs de imágenes del producto separadas por coma", example = "img/producto1.jpg,img/producto2.jpg")
     private String imagenes;
 
+    @Schema(description = "Género target del producto", example = "hombre", allowableValues = {"hombre", "mujer", "unisex"})
     private String genero; 
 
     @CreationTimestamp
+    @Schema(description = "Fecha de creación automática")
     private LocalDateTime fechaCreacion;
 
     @ManyToMany
@@ -43,6 +54,7 @@ public class Producto {
         joinColumns = @JoinColumn(name = "producto_id"),
         inverseJoinColumns = @JoinColumn(name = "categoria_id")
     )
+    @Schema(description = "Categorías asociadas al producto")
     private Set<Categoria> categorias = new HashSet<>();
 
     public Producto() {}
