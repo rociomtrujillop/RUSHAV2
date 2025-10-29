@@ -47,38 +47,6 @@ public class ProductoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Crear nuevo producto", description = "Agrega un nuevo producto al catálogo")
-    @PostMapping
-    public ResponseEntity<Producto> crear(@Valid @RequestBody Producto p) {
-        Producto creado = service.crear(p);
-        return ResponseEntity.ok(creado);
-    }
-
-    @Operation(summary = "Actualizar producto", description = "Modifica los datos de un producto existente")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente"),
-        @ApiResponse(responseCode = "404", description = "Producto no encontrado")
-    })
-    @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizar(
-            @Parameter(description = "ID del producto") @PathVariable Long id, 
-            @Valid @RequestBody Producto p) {
-        try {
-            Producto actualizado = service.actualizar(id, p);
-            return ResponseEntity.ok(actualizado);
-        } catch (RuntimeException ex) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @Operation(summary = "Eliminar producto", description = "Elimina permanentemente un producto del sistema")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(
-            @Parameter(description = "ID del producto") @PathVariable Long id) {
-        service.eliminar(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @Operation(summary = "Buscar productos por nombre", description = "Filtra productos que contengan el texto en su nombre")
     @GetMapping("/buscar")
     public ResponseEntity<List<Producto>> buscar(
@@ -120,6 +88,38 @@ public class ProductoController {
             @Parameter(description = "Género del producto") @PathVariable String genero, 
             @Parameter(description = "Texto a buscar en nombres") @RequestParam String nombre) {
         return ResponseEntity.ok(service.buscarPorGeneroYNombre(genero, nombre));
+    }
+
+    @Operation(summary = "Crear nuevo producto", description = "Agrega un nuevo producto al catálogo")
+    @PostMapping
+    public ResponseEntity<Producto> crear(@Valid @RequestBody Producto p) {
+        Producto creado = service.crear(p);
+        return ResponseEntity.ok(creado);
+    }
+
+    @Operation(summary = "Actualizar producto", description = "Modifica los datos de un producto existente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Producto actualizado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Producto> actualizar(
+            @Parameter(description = "ID del producto") @PathVariable Long id, 
+            @Valid @RequestBody Producto p) {
+        try {
+            Producto actualizado = service.actualizar(id, p);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Eliminar producto", description = "Elimina permanentemente un producto del sistema")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(
+            @Parameter(description = "ID del producto") @PathVariable Long id) {
+        service.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 
     // ========== MÉTODOS PARA IMÁGENES ==========

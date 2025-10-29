@@ -15,7 +15,7 @@ INSERT INTO categorias (nombre, descripcion, tipo, activa) VALUES
 ('Emily the Strange', 'Colaboración Emily the Strange', 'temporal', true);
 
 INSERT INTO usuarios (nombre, email, password, rol, region, comuna, activo) VALUES 
-('Administrador', 'admin@rushav.cl', 'admin123', 'super-admin', 'Metropolitana', 'Santiago', true);
+('Administrador', 'admin@rushav.cl', '$2a$10$uBLIt7nFqY/QDGx.x7h95uPQbewpf7CEZyznyrnqQTS7rFi.6f61q', 'super-admin', 'Metropolitana', 'Santiago', true);
 
 INSERT INTO productos (nombre, descripcion, precio, stock, imagenes, genero, activo) VALUES
 ('Polera Heartstruck', 'Polera oversize con estampado exclusivo.', 9990, 20, 'img/producto1.jpg,img/producto1.2.jpg', 'hombre', true),

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
@@ -19,9 +20,11 @@ import java.util.Optional;
 @Tag(name = "1. Autenticación", description = "Endpoints para manejo de login y autenticación")
 public class AuthController {
     private final UsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UsuarioService usuarioService) {
+    public AuthController(UsuarioService usuarioService, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Operation(summary = "Iniciar sesión", description = "Valida credenciales de usuario y retorna información del perfil")
@@ -47,13 +50,15 @@ public class AuthController {
 
         Usuario u = opt.get();
         
-        if (u.getPassword().equals(req.getPassword())) {
-            u.setPassword(null);
+        if (passwordEncoder.matches(req.getPassword(), u.getPassword())) {
+            // Si coinciden: Éxito
+            u.setPassword(null); // No devolver la contraseña (aunque esté encriptada)
             LoginResponse r = new LoginResponse();
             r.setMensaje("OK");
             r.setUsuarios(u);
             return ResponseEntity.ok(r);
         } else {
+            // Si NO coinciden: Error
             LoginResponse r = new LoginResponse();
             r.setMensaje("Credenciales incorrectas");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(r);

@@ -3,6 +3,9 @@ package com.rushav.rushav_backend.services.impl;
 import com.rushav.rushav_backend.entities.Usuario;
 import com.rushav.rushav_backend.repositories.UsuarioRepository;
 import com.rushav.rushav_backend.services.UsuarioService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +13,11 @@ import java.util.Optional;
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository repo;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioServiceImpl(UsuarioRepository repo) {
+    public UsuarioServiceImpl(UsuarioRepository repo, PasswordEncoder passwordEncoder) {
         this.repo = repo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -32,9 +37,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario crear(Usuario u) {
-        // SIN ENCRIPTACIÓN - guarda password directo
         if (u.getRol() == null) u.setRol("cliente");
         // Los campos region y comuna se guardan si vienen en 'u'
+        u.setPassword(passwordEncoder.encode(u.getPassword())); // Encriptar contraseña
         return repo.save(u);
     }
 
@@ -59,7 +64,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isBlank()) {
                 System.out.println("-> Se recibió nueva contraseña. Actualizando..."); // Log
                 // Si SÍ viene una nueva, actualiza la contraseña en el usuario existente ('ex')
-                usuarioExistente.setPassword(usuarioActualizado.getPassword()); // Guarda directo (texto plano)
+                usuarioExistente.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword())); // Encriptar y guardar
             } else {
                 System.out.println("-> No se recibió nueva contraseña o estaba vacía. Contraseña existente NO se modifica."); // Log
                 // Si NO viene una nueva (es null o vacía), simplemente NO se hace nada,
