@@ -1,55 +1,74 @@
-// src/pages/admin/AdminCategoriasListar.jsx
-
-import React, { useState, useEffect } from 'react';
+// src/pages/admin/AdminCategoriasListar.jsx (Restaurado el borrado físico)
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Button, Spinner, Alert } from 'react-bootstrap';
+import { Table, Button, Spinner, Alert, Form, Container, Row, Col } from 'react-bootstrap';
+import { useAuth } from '../../context/AuthContext'; 
 
-const API_URL = 'http://localhost:8080/api/categorias';
+const API_URL = '/api/categorias';
 
 function AdminCategoriasListar() {
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { fetchProtegido } = useAuth();
+  const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchCategorias();
-  }, []);
-
-  const fetchCategorias = async () => {
+  const fetchCategorias = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/todas`); 
-      if (!response.ok) throw new Error('Error al cargar categorías');
-      const data = await response.json();
+      setError(null);
+      const data = await fetchProtegido(`${API_URL}/todas`); 
       setCategorias(data);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchProtegido]);
 
+  useEffect(() => {
+    fetchCategorias();
+  }, [fetchCategorias]);
+
+  // --- FUNCIÓN DE ELIMINAR FÍSICO (LA QUE QUERÍAS) ---
   const handleEliminar = async (id) => {
-    if (window.confirm('¿Estás seguro?')) {
+    // Advertencia más seria
+    if (window.confirm('¿ELIMINAR PERMANENTEMENTE? Esta acción no se puede deshacer y solo funcionará si NINGÚN producto está usando esta categoría.')) {
       try {
-        const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Error al eliminar la categoría');
-        fetchCategorias(); 
+        // Llama al endpoint DELETE
+        await fetchProtegido(`${API_URL}/${id}`, { method: 'DELETE' });
+        alert('Categoría eliminada permanentemente.');
+        fetchCategorias(); // Refresca la lista
       } catch (err) {
+        // El GlobalExceptionHandler del backend enviará el mensaje de error
+        // ej: "No se puede eliminar porque está siendo usada..."
         alert(err.message);
       }
     }
   };
+  
+  const categoriasFiltradas = categorias.filter(cat => {
+      if (!searchTerm) return true;
+      return cat.nombre && cat.nombre.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
-  if (loading) return <Spinner animation="border" variant="primary" />;
-  if (error) return <Alert variant="danger">{error}</Alert>;
+  if (loading) return <Container className="text-center p-5"><Spinner animation="border" variant="primary" /></Container>;
+  if (error) return <Container className="p-5"><Alert variant="danger">{error}</Alert></Container>;
 
   return (
-    <div>
+    <Container>
       <h2>Gestión de Categorías</h2>
-      <Button as={Link} to="/admin/categorias/crear" variant="primary" className="mb-3">
-        Crear Nueva Categoría
-      </Button>
+      
+      <Row className="mb-3 gy-2 align-items-center">
+        <Col md={8}>
+          <Form.Control 
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </Col>
+      </Row>
       
       <Table striped bordered hover responsive>
         <thead>
@@ -57,30 +76,45 @@ function AdminCategoriasListar() {
             <th>ID</th>
             <th>Nombre</th>
             <th>Tipo</th>
-            <th>Activa</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {categorias.map(cat => (
-            <tr key={cat.id}>
+          {categoriasFiltradas.map(cat => (
+            <tr key={cat.id} className={!cat.activa ? 'text-muted' : ''}>
               <td>{cat.id}</td>
               <td>{cat.nombre}</td>
               <td>{cat.tipo}</td>
-              <td>{cat.activa ? 'Sí' : 'No'}</td>
+              <td>{cat.activa ? 'Activa' : 'Inactiva'}</td>
               <td>
-                <Button as={Link} to={`/admin/categorias/editar/${cat.id}`} variant="warning" size="sm" className="me-2">
+                <Button as={Link} to={`/admin/categorias/editar/${cat.id}`} variant="primary" size="sm" className="me-2">
                   Editar
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleEliminar(cat.id)}>
+                
+                {/* --- BOTÓN DE ELIMINAR FÍSICO RESTAURADO --- */}
+                <Button 
+                  variant="danger"
+                  size="sm" 
+                  onClick={() => handleEliminar(cat.id)}
+                >
                   Eliminar
                 </Button>
               </td>
             </tr>
           ))}
+          
+          {!loading && categoriasFiltradas.length === 0 && ( 
+              <tr>
+                  <td colSpan="5" className="text-center"> 
+                     No se encontraron categorías con los filtros aplicados.
+                  </td>
+              </tr>
+          )}
+          
         </tbody>
       </Table>
-    </div>
+    </Container>
   );
 }
 

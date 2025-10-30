@@ -137,3 +137,44 @@ input[type="number"] {
 .alert-info .alert-heading {
    color: inherit; 
 }
+
+.navbar-nav .nav-link {
+  font-size: 1.1rem; /* Más grande que 1rem, pero más chico que el logo */
+  font-weight: 500;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.navbar-text {
+  font-size: 1.1rem;
+}
+
+.navbar-nav .nav-link.carrito {
+  font-weight: 500;
+}
+
+/* --- 6. Estilos del Footer (CORREGIDO) --- */
+
+/* 1. Estilo para los LINKS (Nosotros, Contacto) */
+footer a {
+  font-size: 1.1rem;  /* Tamaño de fuente grande */
+  font-weight: 500;
+  /* Este es el color "gris" del header */
+  color: rgba(255, 255, 255, 0.55) !important; 
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+/* 2. Estilo HOVER para los links */
+footer a:hover {
+   /* Este es el color "gris claro" del header al pasar el mouse */
+   color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* 3. Estilo para el PÁRRAFO (Copyright) */
+footer p {
+  font-size: 1.1rem; /* Mismo tamaño de fuente */
+  font-weight: 500; /* Mismo peso de fuente */
+  color: #FFFFFF !important; /* Color blanco brillante */
+  margin-bottom: 0; /* Para alinear verticalmente */
+}

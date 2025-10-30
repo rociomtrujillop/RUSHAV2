@@ -1,50 +1,44 @@
-// src/pages/admin/AdminUsuariosForm.jsx (Corregido con Región/Comuna)
+// src/pages/admin/AdminUsuariosForm.jsx (CON VALIDACIÓN DE REGIÓN/COMUNA)
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Card, Row, Col, Spinner, Alert } from 'react-bootstrap';
-// Importamos las regiones
 import { regiones } from '../../data/regiones.js'; 
+import { useAuth } from '../../context/AuthContext';
 
-const API_URL = 'http://localhost:8080/api/usuarios';
+const API_URL = '/api/usuarios';
 
 function AdminUsuariosForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
+  const { fetchProtegido } = useAuth();
 
-  // Estado del usuario (incluye region y comuna)
   const [usuario, setUsuario] = useState({
     nombre: '',
     email: '',
     password: '',
     rol: 'cliente',
     activo: true,
-    region: '', // Añadido
-    comuna: ''  // Añadido
+    region: '', // Estado inicial es string vacío
+    comuna: ''  // Estado inicial es string vacío
   });
-
-  // Estado para la lista de comunas (depende de la región seleccionada)
-  const [comunas, setComunas] = useState([]); 
-
+  const [comunas, setComunas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // --- Efecto 1: Cargar datos del usuario para editar ---
+  // (useEffect para cargar usuario - sin cambios)
   useEffect(() => {
     if (isEditing) {
       setLoading(true);
       const fetchUsuario = async () => {
         try {
-          const response = await fetch(`${API_URL}/${id}`);
-          if (!response.ok) throw new Error('Usuario no encontrado');
-          const data = await response.json();
-          // Establecemos TODOS los campos (excepto password)
+          const data = await fetchProtegido(`${API_URL}/${id}`);
           setUsuario({ 
               ...data, 
-              password: '', // Password en blanco por defecto al editar
+              password: '',
               region: data.region || '', // Asegura que sea string vacío si es null
-              comuna: data.comuna || ''   // Asegura que sea string vacío si es null
+              comuna: data.comuna || '' 
           }); 
         } catch (err) {
           setError(err.message);
@@ -54,35 +48,26 @@ function AdminUsuariosForm() {
       };
       fetchUsuario();
     }
-  }, [isEditing, id]); // Depende de isEditing y id
+  }, [isEditing, id, fetchProtegido]);
 
-  // --- Efecto 2: Actualizar lista de comunas cuando cambia la región del estado 'usuario' ---
+  // (useEffect para comunas y handleChange - sin cambios)
   useEffect(() => {
-    // Usamos usuario.region (del estado) para encontrar las comunas
     const regionSeleccionada = usuario.region; 
     const regionEncontrada = regiones.find(r => r.nombre === regionSeleccionada);
     const comunasDeRegion = regionEncontrada ? regionEncontrada.comunas : [];
     setComunas(comunasDeRegion);
-
-    // Si la comuna actual en el estado no pertenece a la nueva lista de comunas,
-    // la reseteamos (¡Importante al cambiar de región en el formulario!)
     if (regionSeleccionada && !comunasDeRegion.includes(usuario.comuna)) {
-      setUsuario(prev => ({ ...prev, comuna: '' })); // Resetea la comuna en el estado
+      setUsuario(prev => ({ ...prev, comuna: '' }));
     }
-    
-  }, [usuario.region]); // Depende SOLO de usuario.region
+  }, [usuario.region]);
 
-  // --- Manejador de cambios (unificado) ---
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
     setUsuario(prev => {
         const newState = {
            ...prev,
            [name]: type === 'checkbox' ? checked : value
         };
-        // Si cambió la región, reseteamos la comuna inmediatamente en el mismo update
-        // (Esto evita un re-render extra del useEffect de comunas)
         if (name === 'region') {
             newState.comuna = ''; 
         }
@@ -90,45 +75,63 @@ function AdminUsuariosForm() {
     });
   };
 
-  // --- Manejador de Submit (sin cambios en la lógica de envío) ---
+  // --- handleSubmit CON VALIDACIONES AÑADIDAS ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Validamos que si hay región, también haya comuna (excepto si se deja en blanco intencionalmente)
+    // Validaciones de texto (sin cambios)
+    if (!usuario.nombre || usuario.nombre.length < 3) {
+        setError('El nombre debe tener al menos 3 caracteres.'); setLoading(false); return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(usuario.email)) {
+        setError('El formato del email no es válido.'); setLoading(false); return;
+    }
+    if (!isEditing && (!usuario.password || usuario.password.length < 6)) {
+        setError('La contraseña es obligatoria y debe tener al menos 6 caracteres.'); setLoading(false); return;
+    }
+    if (isEditing && usuario.password && usuario.password.length < 6) {
+        setError('La nueva contraseña debe tener al menos 6 caracteres.'); setLoading(false); return;
+    }
+    if (!usuario.rol) {
+        setError('Debes seleccionar un rol.'); setLoading(false); return;
+    }
+
+    // --- 1. VALIDACIÓN AÑADIDA ---
+    // Si el usuario seleccionó una región, DEBE seleccionar una comuna
     if (usuario.region && !usuario.comuna) {
-        setError('Si seleccionas una región, debes seleccionar una comuna.');
+        setError('Si seleccionas una región, también debes seleccionar una comuna.');
         setLoading(false);
         return;
     }
 
     const usuarioParaEnviar = { ...usuario };
-    
-    // Si estamos editando y el password está vacío, no lo enviamos para no sobreescribirlo
     if (isEditing && !usuario.password) {
       delete usuarioParaEnviar.password;
     }
-
-    // Asegurarse de que region y comuna sean null si están vacíos, si tu backend lo prefiere
-    // Si tu backend acepta strings vacíos, puedes quitar estas líneas:
-    // if (!usuarioParaEnviar.region) usuarioParaEnviar.region = null;
-    // if (!usuarioParaEnviar.comuna) usuarioParaEnviar.comuna = null;
-
-
+    
+    if (usuarioParaEnviar.region === "") {
+        usuarioParaEnviar.region = null;
+    }
+    if (usuarioParaEnviar.comuna === "") {
+        usuarioParaEnviar.comuna = null;
+    }
+    
+    if (!usuarioParaEnviar.region || !usuarioParaEnviar.comuna) {
+        setError('La región y la comuna son obligatorias.');
+        setLoading(false);
+        return;
+    }
     const url = isEditing ? `${API_URL}/${id}` : API_URL;
     const method = isEditing ? 'PUT' : 'POST';
 
     try {
-      const response = await fetch(url, {
+      await fetchProtegido(url, {
         method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(usuarioParaEnviar) // Enviamos el objeto completo
+        body: JSON.stringify(usuarioParaEnviar)
       });
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || (isEditing ? 'Error al actualizar' : 'Error al crear'));
-      }
+      
       alert(`Usuario ${isEditing ? 'actualizado' : 'creado'} con éxito`);
       navigate('/admin/usuarios');
     } catch (err) {
@@ -138,16 +141,15 @@ function AdminUsuariosForm() {
     }
   };
 
+  // --- JSX (Sin cambios) ---
   if (loading && isEditing) return <Spinner animation="border" variant="primary" />;
-
-  // --- JSX del Formulario (Añadimos selects de Región/Comuna) ---
   return (
     <Container>
       <Row className="justify-content-center">
         <Col md={8}>
           <Card className="p-4">
             <Card.Title as="h2">{isEditing ? 'Editar Usuario' : 'Crear Usuario'}</Card.Title>
-            {error && <Alert variant="danger">{error}</Alert>}
+            {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
             <Form onSubmit={handleSubmit}>
               
               <Form.Group className="mb-3" controlId="nombre">
@@ -168,22 +170,20 @@ function AdminUsuariosForm() {
                   value={usuario.password} 
                   onChange={handleChange} 
                   placeholder={isEditing ? 'Dejar en blanco para no cambiar' : ''}
-                  // Password solo es requerido al CREAR (!isEditing)
                   required={!isEditing} 
                 />
               </Form.Group>
 
-              {/* --- 👇 SELECTS REGIÓN Y COMUNA AÑADIDOS 👇 --- */}
               <Row>
                 <Col md={6}>
                   <Form.Group className="mb-3" controlId="regionAdmin">
                     <Form.Label>Región</Form.Label>
                     <Form.Select 
-                      name="region" // Coincide con el estado
-                      value={usuario.region} // Vinculado al estado
-                      onChange={handleChange} // Usa el manejador unificado
+                      name="region"
+                      value={usuario.region}
+                      onChange={handleChange}
                     >
-                      <option value="">-- Sin Región --</option> {/* Opción para dejar en blanco */}
+                      <option value="">-- Sin Región --</option>
                       {regiones.map(r => (
                         <option key={r.nombre} value={r.nombre}>{r.nombre}</option>
                       ))}
@@ -194,13 +194,12 @@ function AdminUsuariosForm() {
                   <Form.Group className="mb-3" controlId="comunaAdmin">
                     <Form.Label>Comuna</Form.Label>
                     <Form.Select 
-                      name="comuna" // Coincide con el estado
-                      value={usuario.comuna} // Vinculado al estado
-                      onChange={handleChange} // Usa el manejador unificado
-                      // Se deshabilita si no hay región o si la lista de comunas está vacía
+                      name="comuna"
+                      value={usuario.comuna}
+                      onChange={handleChange}
                       disabled={!usuario.region || comunas.length === 0} 
                     >
-                      <option value="">-- Sin Comuna --</option> {/* Opción para dejar en blanco */}
+                      <option value="">-- Sin Comuna --</option>
                       {comunas.map(c => (
                         <option key={c} value={c}>{c}</option>
                       ))}
@@ -208,7 +207,6 @@ function AdminUsuariosForm() {
                   </Form.Group>
                 </Col>
               </Row>
-              {/* --- 👆 FIN SELECTS 👆 --- */}
               
               <Form.Group className="mb-3" controlId="rol">
                 <Form.Label>Rol</Form.Label>

@@ -1,109 +1,147 @@
-// src/context/AuthContext.jsx (Refinado con más Logs y Verificaciones)
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+const API_URL = "http://localhost:8080";
+const AUTH_TOKEN_KEY = "authToken";
+const USER_KEY = "usuario";
 
-// 1. Crear el Contexto
 const AuthContext = createContext(null);
 
-// 2. Crear el Proveedor
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null); 
-  const [loadingAuth, setLoadingAuth] = useState(true); // Renombrado para claridad
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
 
-  // --- Efecto para verificar localStorage al inicio ---
+  // (useEffect para cargar desde localStorage - sin cambios)
   useEffect(() => {
-    console.log("[AuthContext] useEffect: Verificando localStorage...");
-    setLoadingAuth(true); // Asegura que estemos en estado de carga
     try {
-      const storedUserString = localStorage.getItem('usuario');
-      if (storedUserString) {
+      const storedUserString = localStorage.getItem(USER_KEY);
+      const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+      if (storedUserString && storedToken) {
         const storedUserData = JSON.parse(storedUserString);
-        // Espera la estructura { mensaje: ..., usuarios: { ... } }
-        if (storedUserData && storedUserData.usuarios && storedUserData.usuarios.id) { // Verifica ID como mínimo
-          console.log("[AuthContext] useEffect: Usuario encontrado y válido en localStorage:", storedUserData.usuarios);
-          setCurrentUser(storedUserData.usuarios);
+        if (storedUserData && storedUserData.id && storedToken) {
+          setCurrentUser(storedUserData);
+          setAuthToken(storedToken);
         } else {
-          console.warn("[AuthContext] useEffect: Estructura inválida en localStorage, limpiando.");
-          localStorage.removeItem('usuario');
-          setCurrentUser(null); // Asegura que currentUser sea null si los datos son malos
+          localStorage.removeItem(USER_KEY);
+          localStorage.removeItem(AUTH_TOKEN_KEY);
         }
-      } else {
-        console.log("[AuthContext] useEffect: No hay usuario en localStorage.");
-        setCurrentUser(null); // Asegura que currentUser sea null
       }
     } catch (error) {
-      console.error("[AuthContext] useEffect: Error al leer/parsear localStorage:", error);
-      localStorage.removeItem('usuario');
-      setCurrentUser(null); // Asegura que currentUser sea null en caso de error
+      console.error("Error al leer localStorage:", error);
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(AUTH_TOKEN_KEY);
     } finally {
-      console.log("[AuthContext] useEffect: Verificación inicial completada.");
-      setLoadingAuth(false); // Terminamos la carga inicial
+      setLoadingAuth(false);
     }
-  }, []); // Solo se ejecuta al montar
+  }, []);
 
-  // --- Función Login ---
-  const login = (userDataResponse) => {
-    console.log("[AuthContext] login: Intentando iniciar sesión con:", userDataResponse);
-    // Verifica la estructura esperada { mensaje: ..., usuarios: { ... } }
-    if (userDataResponse && userDataResponse.usuarios && userDataResponse.usuarios.id) { // Verifica ID
-      try {
-        localStorage.setItem('usuario', JSON.stringify(userDataResponse)); // Guarda toda la respuesta
-        setCurrentUser(userDataResponse.usuarios); // Actualiza el estado del contexto
-        console.log("[AuthContext] login: Estado currentUser actualizado:", userDataResponse.usuarios);
-        return userDataResponse.usuarios; // Devuelve el objeto usuario
-      } catch (error) {
-          console.error("[AuthContext] login: Error al guardar en localStorage:", error);
-          // Limpia por seguridad si falla el guardado
-          localStorage.removeItem('usuario');
-          setCurrentUser(null); 
-          return null;
-      }
-    } else {
-        console.error("[AuthContext] login: Datos de respuesta inválidos:", userDataResponse);
-        // Asegurarse de limpiar si los datos son malos
-        localStorage.removeItem('usuario');
-        setCurrentUser(null);
-        return null;
-    }
-  };
-
-  // --- Función Logout ---
-  const logout = () => {
-    console.log("[AuthContext] logout: Cerrando sesión...");
+  // (Función login - sin cambios)
+  const login = async (email, password) => {
     try {
-        localStorage.removeItem('usuario');
-        setCurrentUser(null); // Actualiza el estado del contexto
-        console.log("[AuthContext] logout: Estado currentUser limpiado.");
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: password }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.mensaje || "Credenciales incorrectas");
+      }
+      if (data && data.usuarios && data.usuarios.id) {
+        const basicToken = "Basic " + btoa(`${email}:${password}`);
+        localStorage.setItem(USER_KEY, JSON.stringify(data.usuarios));
+        localStorage.setItem(AUTH_TOKEN_KEY, basicToken);
+        setCurrentUser(data.usuarios);
+        setAuthToken(basicToken);
+        return data.usuarios;
+      } else {
+        throw new Error("Respuesta de login inválida.");
+      }
     } catch (error) {
-        console.error("[AuthContext] logout: Error al limpiar localStorage:", error);
-        // Aunque falle la limpieza, actualizamos el estado local
-        setCurrentUser(null);
+      logout();
+      throw error;
     }
   };
 
-  // Valor del contexto
+  // (Función logout - sin cambios)
+  const logout = useCallback(() => {
+    try {
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      setCurrentUser(null);
+      setAuthToken(null);
+    } catch (error) {
+      console.error("Error al limpiar localStorage:", error);
+      setCurrentUser(null);
+      setAuthToken(null);
+    }
+  }, []);
+
+  // --- fetchProtegido (para JSON) - MODIFICADO ---
+  const fetchProtegido = useCallback(async (url, options = {}) => {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) {
+      logout();
+      throw new Error("Usuario no autenticado.");
+    }
+    const headers = {
+      ...options.headers,
+      "Authorization": token,
+      "Content-Type": "application/json"
+    };
+    const response = await fetch(`${API_URL}${url}`, { ...options, headers });
+
+    // <-- CAMBIO 1: LEEMOS EL ERROR COMO TEXTO ANTES DE FALLAR
+    if (!response.ok) {
+      const errorBody = await response.text(); // Lee el error como texto
+      // Esto mostrará "El email ya está registrado"
+      throw new Error(errorBody || `Error ${response.status}`);
+    }
+    
+    if (response.status === 204) { // No Content (para DELETE)
+        return { ok: true };
+    }
+    
+    // Si todo está OK, leemos el JSON
+    return response.json();
+  }, [logout]);
+
+  // --- fetchProtegidoArchivo (para FormData) - MODIFICADO ---
+  const fetchProtegidoArchivo = useCallback(async (url, options = {}) => {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (!token) {
+      logout();
+      throw new Error("Usuario no autenticado.");
+    }
+    const headers = { ...options.headers, "Authorization": token };
+    const response = await fetch(`${API_URL}${url}`, { ...options, headers });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(errorBody || `Error ${response.status}`);
+    }
+    
+    // <-- CAMBIO 2: LEEMOS LA RESPUESTA COMO TEXTO (LA URL)
+    return response.text();
+  }, [logout]);
+
+
   const value = {
     currentUser,
-    isLoggedIn: !!currentUser, 
+    isLoggedIn: !!currentUser && !!authToken,
     login,
     logout,
-    loadingAuth 
+    fetchProtegido,
+    fetchProtegidoArchivo,
+    loadingAuth
   };
 
-  // --- Renderizado Condicional de Carga ---
-  // Muestra "Verificando..." solo mientras loadingAuth es true
   if (loadingAuth) {
-    console.log("[AuthContext] Render: Mostrando estado de carga...");
-    // Puedes poner un spinner de Bootstrap aquí si prefieres
-    return <div>Verificando sesión...</div>; 
+    return <div>Verificando sesión...</div>;
   }
-
-  console.log("[AuthContext] Render: Proveedor listo, currentUser:", currentUser); // Log final antes de renderizar hijos
-  // Renderiza los hijos solo cuando la carga inicial ha terminado
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// 3. Hook Personalizado (sin cambios)
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

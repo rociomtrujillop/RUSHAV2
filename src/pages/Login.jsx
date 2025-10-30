@@ -1,18 +1,14 @@
-// src/pages/Login.jsx (CORREGIDO - Uso correcto de loggedUser del contexto)
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Form, Button, Alert, Card } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext'; 
-
-const API_URL_LOGIN = 'http://localhost:8080/api/auth/login';
 
 function Login() {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth(); // Obtiene 'login' del contexto
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,46 +19,15 @@ function Login() {
     }
 
     try {
-      const response = await fetch(API_URL_LOGIN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: correo, password: password }),
-      });
-      if (!response.ok) {
-         let errorMessage = 'Correo o contraseña incorrectos.';
-         try {
-           const errorData = await response.json(); 
-           if (errorData && errorData.mensaje) {
-             errorMessage = errorData.mensaje; 
-           }
-         } catch (jsonError) {
-           console.error("Error al parsear respuesta de error:", jsonError);
-         }
-        throw new Error(errorMessage);
-      }
+      const loggedUser = await login(correo, password);
       
-      const usuarioLogueadoResponse = await response.json(); // Toda la respuesta {mensaje, usuarios}
-
-      // Llama al login del contexto. Devuelve el objeto usuario o null.
-      const loggedUser = login(usuarioLogueadoResponse); 
-
-      // --- 👇 **CORRECCIÓN LÓGICA** 👇 ---
-      // Verifica si 'loggedUser' (el objeto usuario directo) existe y tiene nombre/rol
-      if (!loggedUser || !loggedUser.nombre || !loggedUser.rol) { 
-          // Si login() devolvió null o el objeto usuario está incompleto
-          throw new Error('Respuesta inválida del servidor o error al procesar login.'); 
-      }
+      alert(`¡Bienvenido, ${loggedUser.nombre}!`);
       
-      // Usa 'loggedUser' directamente
-      alert(`¡Bienvenido, ${loggedUser.nombre}!`); 
-
-      // Usa 'loggedUser.rol' directamente
       if (loggedUser.rol === 'admin' || loggedUser.rol === 'super-admin') { 
-        navigate('/admin'); 
+        navigate('/admin');
       } else {
         navigate('/');
       }
-      // --- 👆 **FIN CORRECCIÓN LÓGICA** 👆 ---
       
     } catch (err) {
       setError(err.message);

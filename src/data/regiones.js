@@ -1,7 +1,3 @@
-// src/data/regiones.js
-
-// Usamos "export const" para crear una "exportación nombrada".
-// Esta es la forma más limpia.
 export const regiones = [
   { nombre: "Arica y Parinacota", comunas: ["Arica", "Camarones", "General Lagos", "Putre"] },
   { nombre: "Tarapacá", comunas: ["Alto Hospicio", "Camiña", "Colchane", "Huara", "Iquique", "Pica", "Pozo Almonte"] },
@@ -20,5 +16,3 @@ export const regiones = [
   { nombre: "Aysén", comunas: ["Aysén", "Chile Chico", "Cisnes", "Cochrane", "Coyhaique", "Guaitecas", "Lago Verde", "O'Higgins", "Río Ibáñez", "Tortel"] },
   { nombre: "Magallanes", comunas: ["Antártica", "Cabo de Hornos", "Laguna Blanca", "Natales", "Porvenir", "Primavera", "Punta Arenas", "Río Verde", "San Gregorio", "Timaukel", "Torres del Paine"] }
 ];
-
-// ¡YA NO HAY 'export default' AL FINAL!

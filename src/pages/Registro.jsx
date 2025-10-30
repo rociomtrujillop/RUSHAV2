@@ -38,6 +38,12 @@ function Registro() {
       setError("Los correos no coinciden");
       return;
     }
+    
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
     if (password !== password2) {
       setError("Las contraseñas no coinciden");
       return;

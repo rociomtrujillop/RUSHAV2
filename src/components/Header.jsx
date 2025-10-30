@@ -1,47 +1,60 @@
-// src/components/Header.jsx (CORREGIDO - Eliminado useEffect y checkLoginStatus locales)
+// src/components/Header.jsx (Revertido a Izquierda + Control por CSS)
 
-import React from 'react'; // No necesita useState/useEffect
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
-import { Navbar, Nav, Container, Button } from 'react-bootstrap';
-// Importa el hook useAuth para obtener el estado del contexto
+import { Navbar, Nav, Container, Button, Badge } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext'; 
 
 function Header() {
   const navigate = useNavigate();
-  // Obtiene el estado y funciones DIRECTAMENTE del contexto
-  const { isLoggedIn, currentUser, logout, loadingAuth } = useAuth(); 
+  const { isLoggedIn, currentUser, logout } = useAuth(); 
+  
+  const [cartCount, setCartCount] = useState(0);
 
-  // handleLogout ahora solo usa 'logout' del contexto
+  // Función para leer el carrito de localStorage
+  const updateCartCount = () => {
+    const carritoGuardado = JSON.parse(localStorage.getItem("carrito")) || [];
+    const totalItems = carritoGuardado.reduce((acc, item) => acc + (item.cantidad || 1), 0);
+    setCartCount(totalItems);
+  };
+
+  // Efecto para cargar y escuchar cambios en el carrito
+  useEffect(() => {
+    updateCartCount();
+    window.addEventListener('storage', updateCartCount); 
+    window.addEventListener('cartUpdated', updateCartCount);
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+      window.removeEventListener('cartUpdated', updateCartCount);
+    };
+  }, []); 
+
   const handleLogout = () => {
     logout(); 
     navigate('/login'); 
   };
 
-  // Opcional: Mostrar estado de carga mientras el contexto verifica localStorage
-  // if (loadingAuth) {
-  //   return (
-  //     <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
-  //       <Container>
-  //         <Navbar.Brand as={Link} to="/" className="logo">RUSHAV</Navbar.Brand>
-  //         <Navbar.Text>Cargando...</Navbar.Text>
-  //       </Container>
-  //     </Navbar>
-  //   );
-  // }
-
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top" collapseOnSelect>
       <Container>
+        {/* Vuelve a usar la clase "logo" del styles.css */}
         <Navbar.Brand as={Link} to="/" className="logo">RUSHAV</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto align-items-center"> 
+          
+          {/* --- 1. GRUPO IZQUIERDA (me-auto) --- */}
+          {/* "me-auto" (margin-end: auto) alinea esto a la izquierda */}
+          <Nav className="me-auto"> 
             <Nav.Link as={Link} to="/ofertas">Ofertas</Nav.Link> 
             <Nav.Link as={Link} to="/categorias">Categorias</Nav.Link>
             <Nav.Link as={Link} to="/productos">Productos</Nav.Link>
             <Nav.Link as={Link} to="/blogs">Blogs</Nav.Link> 
-            <Nav.Link as={Link} to="/carrito" className="carrito ms-2">Carrito</Nav.Link>
-            {/* El bloque condicional usa directamente 'isLoggedIn' y 'currentUser' del contexto */}
+          </Nav>
+
+          {/* --- 2. GRUPO DERECHA --- */}
+          <Nav className="align-items-center">
+            
+            {/* Bloque de Login/Logout */}
             {isLoggedIn ? (
               <>
                 {currentUser && (
@@ -59,7 +72,21 @@ function Header() {
                 <Nav.Link as={Link} to="/registro">Registro</Nav.Link>
               </>
             )}
+
+            {/* Link de Carrito (al final) */}
+            <Nav.Link as={Link} to="/carrito" className="carrito ms-3">
+              Carrito
+              <Badge 
+                pill 
+                bg={cartCount > 0 ? "danger" : "secondary"} 
+                className="ms-1"
+              >
+                {cartCount}
+              </Badge>
+            </Nav.Link>
+
           </Nav>
+
         </Navbar.Collapse>
       </Container>
     </Navbar>

@@ -1,15 +1,16 @@
-// src/pages/admin/AdminCategoriasForm.jsx
-
+// src/pages/admin/AdminCategoriasForm.jsx (MODIFICADO)
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Card, Row, Col, Spinner, Alert } from 'react-bootstrap';
+import { useAuth } from '../../context/AuthContext'; // 1. IMPORTAR
 
-const API_URL = 'http://localhost:8080/api/categorias';
+const API_URL = '/api/categorias';
 
 function AdminCategoriasForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
+  const { fetchProtegido } = useAuth(); // 2. OBTENER
 
   const [categoria, setCategoria] = useState({
     nombre: '',
@@ -17,7 +18,6 @@ function AdminCategoriasForm() {
     tipo: 'principal',
     activa: true
   });
-  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -26,9 +26,8 @@ function AdminCategoriasForm() {
       setLoading(true);
       const fetchCategoria = async () => {
         try {
-          const response = await fetch(`${API_URL}/${id}`);
-          if (!response.ok) throw new Error('Categoría no encontrada');
-          const data = await response.json();
+          // 3. USA fetchProtegido
+          const data = await fetchProtegido(`${API_URL}/${id}`);
           setCategoria(data);
         } catch (err) {
           setError(err.message);
@@ -38,7 +37,7 @@ function AdminCategoriasForm() {
       };
       fetchCategoria();
     }
-  }, [isEditing, id]);
+  }, [isEditing, id, fetchProtegido]); // 4. AÑADIR DEPENDENCIA
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -49,22 +48,19 @@ function AdminCategoriasForm() {
   };
 
   const handleSubmit = async (e) => {
-    // ... (la lógica de submit no cambia) ...
     e.preventDefault();
     setLoading(true);
     setError(null);
     const url = isEditing ? `${API_URL}/${id}` : API_URL;
     const method = isEditing ? 'PUT' : 'POST';
+
     try {
-      const response = await fetch(url, {
+      // 5. USA fetchProtegido
+      await fetchProtegido(url, {
         method: method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(categoria)
       });
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || (isEditing ? 'Error al actualizar' : 'Error al crear'));
-      }
+      
       alert(`Categoría ${isEditing ? 'actualizada' : 'creada'} con éxito`);
       navigate('/admin/categorias');
     } catch (err) {
@@ -74,8 +70,8 @@ function AdminCategoriasForm() {
     }
   };
 
+  // JSX sin cambios
   if (loading && isEditing) return <Spinner animation="border" variant="primary" />;
-
   return (
     <Container>
       <Row className="justify-content-center">
