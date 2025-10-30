@@ -28,7 +28,7 @@ public class Usuario {
     private String email;
 
     @NotBlank 
-    @Size(min = 4, max = 100)
+    @Size(min = 6, max = 100)
     @Schema(description = "Contraseña del usuario", example = "admin123", required = true)
     private String password;
 
