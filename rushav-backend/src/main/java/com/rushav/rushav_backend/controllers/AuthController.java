@@ -4,21 +4,35 @@ import com.rushav.rushav_backend.dtos.LoginRequest;
 import com.rushav.rushav_backend.dtos.LoginResponse;
 import com.rushav.rushav_backend.entities.Usuario;
 import com.rushav.rushav_backend.services.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
+@Tag(name = "1. Autenticación", description = "Endpoints para manejo de login y autenticación")
 public class AuthController {
     private final UsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UsuarioService usuarioService) {
+    public AuthController(UsuarioService usuarioService, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(summary = "Iniciar sesión", description = "Valida credenciales de usuario y retorna información del perfil")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login exitoso"),
+        @ApiResponse(responseCode = "401", description = "Credenciales incorrectas"),
+        @ApiResponse(responseCode = "400", description = "Datos incompletos o inválidos")
+    })
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req) {
         if (req == null || req.getEmail() == null || req.getPassword() == null) {
@@ -36,14 +50,15 @@ public class AuthController {
 
         Usuario u = opt.get();
         
-        // COMPARACIÓN DIRECTA - SIN BCRYPT
-        if (u.getPassword().equals(req.getPassword())) {
-            u.setPassword(null);
+        if (passwordEncoder.matches(req.getPassword(), u.getPassword())) {
+            // Si coinciden: Éxito
+            u.setPassword(null); // No devolver la contraseña (aunque esté encriptada)
             LoginResponse r = new LoginResponse();
             r.setMensaje("OK");
             r.setUsuarios(u);
             return ResponseEntity.ok(r);
         } else {
+            // Si NO coinciden: Error
             LoginResponse r = new LoginResponse();
             r.setMensaje("Credenciales incorrectas");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(r);

@@ -9,5 +9,4 @@ public class RushavBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(RushavBackendApplication.class, args);
 	}
-
 }

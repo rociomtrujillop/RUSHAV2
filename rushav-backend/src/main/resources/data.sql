@@ -1,25 +1,25 @@
 INSERT INTO categorias (nombre, descripcion, tipo, activa) VALUES
 ('Poleras', 'Poleras y remeras', 'principal', true),
-('Jeans', 'Jeans de todos los tipos', 'principal', true),
+('Jeans', 'Jeans', 'principal', true),
 ('Chaquetas', 'Chaquetas y abrigos', 'principal', true),
 ('Zapatillas', 'Calzado urbano', 'principal', true),
 ('Accesorios', 'Gorros, carteras, etc.', 'principal', true),
-('Vestidos', 'Vestidos femeninos', 'principal', true),
+('Vestidos', 'Vestidos', 'principal', true),
 ('Shorts', 'Shorts y bermudas', 'principal', true),
 ('Tops', 'Tops y blusas', 'principal', true),
-('Faldas', 'Faldas femeninas', 'principal', true),
+('Faldas', 'Faldas', 'principal', true),
 ('Von Dutch', 'Marca Von Dutch', 'temporal', true),
 ('Ecko', 'Marca Ecko', 'temporal', true),
-('CA7RIEL & Paco Amoroso', 'Marca colaboración', 'temporal', true),
-('Rilakkuma', 'Marca Rilakkuma', 'temporal', true),
-('Emily the Strange', 'Marca Emily the Strange', 'temporal', true);
+('CA7RIEL & Paco Amoroso', 'Artista colaboración', 'temporal', true),
+('Rilakkuma', 'Colaboración Rilakkuma', 'temporal', true),
+('Emily the Strange', 'Colaboración Emily the Strange', 'temporal', true);
 
-INSERT INTO usuarios (nombre, email, password, rol, activo) VALUES 
-('Administrador', 'admin@rushav.cl', 'admin123', 'super-admin', true);
+INSERT INTO usuarios (nombre, email, password, rol, region, comuna, activo) VALUES 
+('Administrador', 'admin@rushav.cl', '$2a$10$uBLIt7nFqY/QDGx.x7h95uPQbewpf7CEZyznyrnqQTS7rFi.6f61q', 'super-admin', 'Metropolitana', 'Santiago', true);
 
 INSERT INTO productos (nombre, descripcion, precio, stock, imagenes, genero, activo) VALUES
 ('Polera Heartstruck', 'Polera oversize con estampado exclusivo.', 9990, 20, 'img/producto1.jpg,img/producto1.2.jpg', 'hombre', true),
-('Jeans flare negro', 'Jeans con estilo flare.', 29990, 12, 'img/producto2.jpg,img/producto2.2.jpg', 'hombre', true),
+('Jeans flare negro', 'Jeans con estilo flare.', 29990, 12, 'img/producto2.png,img/producto2.2.jpg', 'hombre', true),
 ('Chaqueta efecto cuero', 'Chaqueta de cuero sintético con detalles en metal.', 39990, 8, 'img/producto3.jpg,img/producto3.2.jpg', 'hombre', true),
 ('Zapatillas skate Ecko', 'Zapatillas estilo urbano, cómodas y resistentes.', 49990, 5, 'img/producto4.jpg,img/producto4.2.jpg,img/producto4.3.jpg', 'hombre', true),
 ('Jeans baggy gris', 'Jeans anchos estilo baggy, color gris cloro.', 29990, 15, 'img/producto5.jpg', 'hombre', true),
@@ -35,8 +35,8 @@ INSERT INTO productos (nombre, descripcion, precio, stock, imagenes, genero, act
 ('Jorts parches estrellas', 'Jorts de mezclilla con detalles de estrella.', 19990, 3, 'img/producto15.jpg,img/producto15.2.jpg', 'hombre', true);
 
 INSERT INTO producto_categorias (producto_id, categoria_id) VALUES
-(1, 1), (1, 10),   -- Polera Heartstruck -> Poleras, Von Dutch
-(2, 2), (2, 11),   -- Jeans flare -> Jeans, Ecko
+(1, 1),            -- Polera Heartstruck -> Poleras, Von Dutch
+(2, 2),            -- Jeans flare -> Jeans, Ecko
 (3, 3),            -- Chaqueta -> Chaquetas
 (4, 4), (4, 11),   -- Zapatillas -> Zapatillas, Ecko
 (5, 2),            -- Jeans baggy -> Jeans
@@ -47,6 +47,6 @@ INSERT INTO producto_categorias (producto_id, categoria_id) VALUES
 (10, 8), (10, 10), -- Top -> Tops, Von Dutch
 (11, 9), (11, 10), -- Falda -> Faldas, Von Dutch
 (12, 7), (12, 12), -- Short -> Shorts, CA7RIEL
-(13, 7), (13, 13), -- Peludo -> Shorts, Rilakkuma
+(13, 13),          -- Peludo -> Shorts, Rilakkuma
 (14, 5), (14, 14), -- Cartera -> Accesorios, Emily
 (15, 7);           -- Jorts -> Shorts
