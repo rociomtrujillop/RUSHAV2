@@ -8,8 +8,8 @@ Este proyecto es una aplicación web full-stack completa que simula una tienda d
 
 La aplicación está dividida en dos componentes principales:
 
-1.  [cite_start]**Frontend (Cliente):** Es la tienda pública donde los visitantes pueden registrarse, ver productos [cite: 585-723][cite_start], filtrar por categorías [cite: 304-370] [cite_start]o género [cite: 492-507][cite_start], ver detalles [cite: 445-491][cite_start], añadir productos a un carrito [cite: 282-303] [cite_start]y completar un formulario de checkout [cite: 370-420].
-2.  [cite_start]**Backend (Administración):** Un panel de administración (`/admin`) protegido por contraseña [cite: 100-108]. [cite_start]Los administradores pueden gestionar (Crear, Leer, Actualizar, Eliminar) usuarios [cite: 201-274][cite_start], productos [cite: 109-200] [cite_start]y categorías [cite: 58-98]. [cite_start]Incluye un dashboard con estadísticas clave [cite: 100-108] y accesos directos a listas filtradas.
+1. **Frontend (Cliente):** Es la tienda pública donde los visitantes pueden registrarse, ver productos, filtrar por categorías, añadir productos a un carrito y completar un formulario de checkout
+2. **Backend (Administración):** Un panel de administración (`/admin`) protegido por contraseña. Los administradores pueden gestionar (Crear, Leer, Actualizar, Eliminar) usuarios, productos y categorías. Incluye un dashboard con estadísticas clave y accesos directos a listas filtradas.
 
 ## Arquitectura
 
