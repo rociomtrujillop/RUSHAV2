@@ -91,8 +91,6 @@ function AdminCategoriasListar() {
                 <Button as={Link} to={`/admin/categorias/editar/${cat.id}`} variant="primary" size="sm" className="me-2">
                   Editar
                 </Button>
-                
-                {/* --- BOTÓN DE ELIMINAR FÍSICO RESTAURADO --- */}
                 <Button 
                   variant="danger"
                   size="sm" 

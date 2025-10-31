@@ -1,12 +1,11 @@
-// src/pages/Checkout.jsx (CORREGIDO - Sintaxis del objeto 'pedido')
+// src/pages/Checkout.jsx (CORREGIDO)
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Asegúrate que Link esté importado
+import { useNavigate, Link } from 'react-router-dom';
 import { regiones } from '../data/regiones.js'; 
 import { Container, Row, Col, Form, Button, Card, ListGroup, Alert } from 'react-bootstrap'; 
 
 function Checkout() {
-  // Estados (sin cambios)
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const navigate = useNavigate();
@@ -19,10 +18,9 @@ function Checkout() {
   const [comuna, setComuna] = useState(''); 
   const [comunas, setComunas] = useState([]); 
 
-  // --- useEffect 1: Cargar carrito y **intentar** rellenar datos de usuario ---
+  // --- useEffect 1: Cargar carrito y rellenar datos (CORREGIDO) ---
   useEffect(() => {
-    console.log("[Checkout] useEffect 1 (Mount): Iniciando...");
-    // Carga carrito
+    // Carga carrito (sin cambios)
     try {
         const carritoGuardado = JSON.parse(localStorage.getItem("carrito")) || [];
         setItems(carritoGuardado);
@@ -30,72 +28,47 @@ function Checkout() {
         setTotal(totalCalculado);
     } catch (e) { console.error("Error cargando carrito:", e); }
 
-    // Rellena datos del usuario
+    // Rellena datos del usuario (LÓGICA CORREGIDA)
     try {
-        const usuarioData = JSON.parse(localStorage.getItem("usuario"));
-        console.log("[Checkout] useEffect 1: Datos usuario localStorage:", usuarioData);
+        // 1. Leemos el objeto de usuario (que AHORA SÍ es el usuario)
+        const loggedUser = JSON.parse(localStorage.getItem("usuario"));
         
-        if (usuarioData && usuarioData.usuarios) { 
-            const loggedUser = usuarioData.usuarios; 
-            console.log("[Checkout] useEffect 1: loggedUser encontrado:", loggedUser);
+        // 2. Verificamos que 'loggedUser' exista y tenga un ID
+        if (loggedUser && loggedUser.id) { 
             
-            if (loggedUser.nombre) { setNombre(loggedUser.nombre.split(' ')[0] || ''); setApellidos(loggedUser.nombre.split(' ').slice(1).join(' ') || ''); }
+            if (loggedUser.nombre) { 
+                setNombre(loggedUser.nombre.split(' ')[0] || ''); 
+                setApellidos(loggedUser.nombre.split(' ').slice(1).join(' ') || ''); 
+            }
             setEmail(loggedUser.email || '');
             
-            // --- SIMPLIFICADO: Solo seteamos los valores directamente ---
             if (loggedUser.region) {
-                console.log(`%c[Checkout] useEffect 1: Llamando setRegion('${loggedUser.region}')`, 'color: blue; font-weight: bold;'); // LOG AZUL
                 setRegion(loggedUser.region); 
-            } else {
-                console.log("[Checkout] useEffect 1: No hay región en localStorage.");
             }
             if (loggedUser.comuna) {
-                console.log(`%c[Checkout] useEffect 1: Llamando setComuna('${loggedUser.comuna}')`, 'color: blue; font-weight: bold;'); // LOG AZUL
                 setComuna(loggedUser.comuna); 
-            } else {
-                console.log("[Checkout] useEffect 1: No hay comuna en localStorage.");
             }
-        } else {
-            console.log("[Checkout] useEffect 1: No hay datos de usuario válidos en localStorage.");
         }
     } catch (e) { console.error("Error cargando datos de usuario:", e); }
-    console.log("[Checkout] useEffect 1: Finalizado.");
-  }, []); // El array vacío [] asegura que esto se ejecute solo una vez al cargar
+  }, []); // El array vacío [] asegura que esto se ejecute solo una vez
 
-  // --- useEffect 2: Actualizar comunas y VALIDA la comuna seleccionada ---
+  // --- useEffect 2: Actualizar comunas (sin cambios) ---
   useEffect(() => {
-    // Loguea los valores de estado ACTUALES al inicio de este efecto
-    console.log(`[Checkout] useEffect 2 START: region='${region}', comuna='${comuna}'`); 
-
     const regionEncontrada = region ? regiones.find(r => r.nombre === region) : null;
     const comunasDeRegion = regionEncontrada ? regionEncontrada.comunas : [];
-    console.log("[Checkout] useEffect 2: Comunas calculadas para esta región:", comunasDeRegion);
-    
-    // Actualiza la lista para el dropdown (esto no debería causar problemas)
     setComunas(comunasDeRegion); 
 
-    // --- Lógica de Validación ---
     if (region && comunasDeRegion.length > 0) {
-        // Verifica si la comuna actual (del estado) está en la lista calculada
         const comunaIsValid = comunasDeRegion.includes(comuna);
-        console.log(`[Checkout] useEffect 2: Verificando si '${comuna}' está en [${comunasDeRegion.join(', ')}]: ${comunaIsValid}`); // LOG DE VERIFICACIÓN
-
-        if (!comunaIsValid && comuna !== '') { // Solo resetea si NO es válida Y NO está ya vacía
-            console.warn(`%c[Checkout] useEffect 2: ¡INVALIDA! La comuna '${comuna}' no está en la lista para '${region}'. Llamando setComuna('').`, 'color: red; font-weight: bold;'); // LOG ROJO
-            setComuna(''); // Resetea si no es válida
-        } else if (comunaIsValid) {
-             console.log(`[Checkout] useEffect 2: Comuna '${comuna}' es VÁLIDA para '${region}'. No se resetea.`); // LOG VERDE (implícito)
+        if (!comunaIsValid && comuna !== '') {
+            setComuna('');
         }
-    } else if (!region && comuna !== '') { // Si no hay región pero la comuna no está vacía
-        console.log("[Checkout] useEffect 2: No hay región, reseteando comuna.");
+    } else if (!region && comuna !== '') {
         setComuna(''); 
     }
-    console.log("[Checkout] useEffect 2 END.");
-    
-  // Quitamos 'comuna' de las dependencias temporalmente para ver el flujo exacto
-  // }, [region, comuna]); 
-    }, [region, comuna]); // <-- Ahora depende de AMBOS
-  // --- handleSubmit (CORREGIDO) ---
+  }, [region, comuna]); // Depende de AMBOS
+  
+  // --- handleSubmit (sin cambios) ---
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!nombre || !apellidos || !email || !calle || !region || !comuna) {
@@ -103,15 +76,13 @@ function Checkout() {
       return;
     }
 
-    // --- 👇 CORRECCIÓN: Definir el objeto 'pedido' correctamente 👇 ---
     const pedido = { 
       cliente: { nombre, apellidos, email },
       direccion: { calle, departamento, region, comuna },
-      items: items, // Puedes usar 'items' directamente si la variable tiene el mismo nombre
-      total: total, // Puedes usar 'total' directamente
+      items: items,
+      total: total,
       fecha: new Date().toISOString()
     };
-    // --- 👆 FIN CORRECCIÓN 👆 ---
     
     localStorage.removeItem("carrito");
     navigate('/pago-exitoso', { state: { pedido } });

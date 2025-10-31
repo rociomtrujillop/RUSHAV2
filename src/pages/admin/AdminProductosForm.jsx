@@ -1,4 +1,3 @@
-// src/pages/admin/AdminProductosForm.jsx (CORREGIDO)
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Card, Row, Col, Spinner, Alert, Image, InputGroup } from 'react-bootstrap';

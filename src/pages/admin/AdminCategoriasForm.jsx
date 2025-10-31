@@ -10,7 +10,7 @@ function AdminCategoriasForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
-  const { fetchProtegido } = useAuth(); // 2. OBTENER
+  const { fetchProtegido } = useAuth(); // 2. OBTENER fetchProtegido
 
   const [categoria, setCategoria] = useState({
     nombre: '',

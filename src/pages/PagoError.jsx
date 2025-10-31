@@ -1,5 +1,3 @@
-// src/pages/PagoError.jsx (NUEVO ARCHIVO)
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -11,7 +9,6 @@ function PagoError() {
       <h1 style={{ color: 'red' }}>✗ No se pudo realizar el pago</h1>
       <p>Hubo un error al procesar tu pago. Por favor, inténtalo de nuevo.</p>
       
-      {/* Botón para volver al checkout */}
       <button onClick={() => navigate('/checkout')} className="btn-seguir" style={{ marginRight: '1rem' }}>
         VOLVER A REALIZAR EL PAGO
       </button>

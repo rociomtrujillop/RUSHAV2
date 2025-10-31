@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Card, Spinner, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom'; // 1. IMPORTAR LINK
+import { Link } from 'react-router-dom'; 
 import { useAuth } from '../../context/AuthContext';
 
 const API_URL = '/api/dashboard/estadisticas';
@@ -37,7 +37,6 @@ function AdminDashboard() {
       <h1>Dashboard</h1>
       <p>Resumen de las actividades de la tienda.</p>
       <Row>
-        {/* --- 2. TARJETA DE USUARIOS (ENLACE) --- */}
         <Col md={4}>
           <Link to="/admin/usuarios" className="text-decoration-none">
             <Card bg="primary" text="white" className="mb-3">
@@ -48,8 +47,6 @@ function AdminDashboard() {
             </Card>
           </Link>
         </Col>
-
-        {/* --- 3. TARJETA DE PRODUCTOS (ENLACE) --- */}
         <Col md={4}>
           <Link to="/admin/productos" className="text-decoration-none">
             <Card bg="success" text="white" className="mb-3">
@@ -60,10 +57,7 @@ function AdminDashboard() {
             </Card>
           </Link>
         </Col>
-
-        {/* --- 4. TARJETA DE STOCK BAJO (ENLACE CON FILTRO) --- */}
         <Col md={4}>
-          {/* Este link ahora pasa un parámetro "filtro" a la URL */}
           <Link to="/admin/productos?filtro=stock_bajo" className="text-decoration-none">
             <Card bg="danger" text="white" className="mb-3">
               <Card.Body>

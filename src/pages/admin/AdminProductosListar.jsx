@@ -83,7 +83,6 @@ function AdminProductosListar() {
   return (
     <> 
       <h2>Gestión de Productos</h2>
-      {/* 4. TÍTULO DINÁMICO */}
       {filtroParam === 'stock_bajo' && (
         <Alert variant="danger">Mostrando solo productos con stock bajo (menos de 5)</Alert>
       )}

@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
   const [authToken, setAuthToken] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
 
-  // (useEffect para cargar desde localStorage - sin cambios)
+  // (useEffect para cargar desde localStorage)
   useEffect(() => {
     try {
       const storedUserString = localStorage.getItem(USER_KEY);
@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // (Función login - sin cambios)
+  // (Función login)
   const login = async (email, password) => {
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // --- fetchProtegido (para JSON) - MODIFICADO ---
+  // --- fetchProtegido (para JSON) 
   const fetchProtegido = useCallback(async (url, options = {}) => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) {
@@ -91,7 +91,6 @@ export function AuthProvider({ children }) {
     };
     const response = await fetch(`${API_URL}${url}`, { ...options, headers });
 
-    // <-- CAMBIO 1: LEEMOS EL ERROR COMO TEXTO ANTES DE FALLAR
     if (!response.ok) {
       const errorBody = await response.text(); // Lee el error como texto
       // Esto mostrará "El email ya está registrado"
@@ -106,7 +105,7 @@ export function AuthProvider({ children }) {
     return response.json();
   }, [logout]);
 
-  // --- fetchProtegidoArchivo (para FormData) - MODIFICADO ---
+  // --- fetchProtegidoArchivo (para FormData) ---
   const fetchProtegidoArchivo = useCallback(async (url, options = {}) => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) {

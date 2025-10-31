@@ -1,20 +1,14 @@
-// src/pages/Contacto.jsx (CORREGIDO - Importación de Card añadida)
-
 import React, { useState } from 'react';
-// 👇 **AÑADIR 'Card' AQUÍ** 👇
 import { Container, Row, Col, Form, Button, Alert, Card } from 'react-bootstrap'; 
 
 function Contacto() {
-  // Estados (sin cambios)
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [feedback, setFeedback] = useState({ tipo: '', mensaje: '' });
 
-  // Función correoValido (sin cambios)
   function correoValido(correo) { /* ... */ }
 
-  // Función handleSubmit (sin cambios)
   const handleSubmit = (e) => { /* ... */ };
 
   // --- Renderizado ---
@@ -22,7 +16,6 @@ function Contacto() {
     <Container className="py-4">
       <Row className="justify-content-md-center">
         <Col md={8} lg={6}>
-          {/* 👇 Usas Card aquí, por eso necesita ser importado 👇 */}
           <Card className="p-4 shadow-sm"> 
             <h1 className="text-center mb-4">Contacto</h1>
             <Form id="form-contacto" noValidate onSubmit={handleSubmit}>
@@ -79,12 +72,10 @@ function Contacto() {
               
             </Form>
           </Card> 
-          {/* 👆 Cierre del Card 👆 */}
         </Col>
       </Row>
     </Container>
   );
 }
 
-// Pega aquí las funciones correoValido y handleSubmit si las acorté antes
 export default Contacto;

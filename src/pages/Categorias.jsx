@@ -1,10 +1,7 @@
-// src/pages/Categorias.jsx (Completo y Corregido)
-
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Breadcrumb } from 'react-bootstrap';
 
-// URLs de API
 const API_URL_CATEGORIAS = 'http://localhost:8080/api/categorias';
 const API_URL_PRODUCTOS_POR_CAT = 'http://localhost:8080/api/productos/categoria';
 
@@ -155,7 +152,6 @@ function Categorias() {
     };
 
 
-    // --- Renderizado ---
     return (
         <Container className="py-4">
 

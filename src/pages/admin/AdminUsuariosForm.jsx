@@ -1,5 +1,3 @@
-// src/pages/admin/AdminUsuariosForm.jsx (CON VALIDACIÓN DE REGIÓN/COMUNA)
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Card, Row, Col, Spinner, Alert } from 'react-bootstrap';
@@ -21,13 +19,13 @@ function AdminUsuariosForm() {
     rol: 'cliente',
     activo: true,
     region: '', // Estado inicial es string vacío
-    comuna: ''  // Estado inicial es string vacío
+    comuna: '' 
   });
   const [comunas, setComunas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // (useEffect para cargar usuario - sin cambios)
+  // (useEffect para cargar usuario)
   useEffect(() => {
     if (isEditing) {
       setLoading(true);
@@ -75,13 +73,11 @@ function AdminUsuariosForm() {
     });
   };
 
-  // --- handleSubmit CON VALIDACIONES AÑADIDAS ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Validaciones de texto (sin cambios)
     if (!usuario.nombre || usuario.nombre.length < 3) {
         setError('El nombre debe tener al menos 3 caracteres.'); setLoading(false); return;
     }
@@ -98,8 +94,6 @@ function AdminUsuariosForm() {
         setError('Debes seleccionar un rol.'); setLoading(false); return;
     }
 
-    // --- 1. VALIDACIÓN AÑADIDA ---
-    // Si el usuario seleccionó una región, DEBE seleccionar una comuna
     if (usuario.region && !usuario.comuna) {
         setError('Si seleccionas una región, también debes seleccionar una comuna.');
         setLoading(false);

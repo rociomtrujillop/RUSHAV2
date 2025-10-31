@@ -1,14 +1,10 @@
-// src/components/admin/AdminLayout.jsx (CORREGIDO - Añadir useAuth)
-
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'; 
 import { Nav, Button } from 'react-bootstrap'; 
-// 👇 **IMPORTAR useAuth** 👇
 import { useAuth } from '../../context/AuthContext'; // Asegúrate que la ruta sea correcta
 
 function AdminLayout() {
   const navigate = useNavigate(); 
-  // 👇 **OBTENER logout DEL CONTEXTO** 👇
   const { logout } = useAuth(); // Obtiene logout del contexto
 
   const handleLogout = () => {
@@ -21,7 +17,6 @@ function AdminLayout() {
       <div className="sidebar">
         <h2>Admin Panel</h2>
         <Nav className="flex-column">
-          {/* ... Tus NavLinks ... */}
           <NavLink to="/admin" end className="nav-link">Inicio</NavLink>
           <h3 className="h6 mt-3">Usuarios</h3>
           <NavLink to="/admin/usuarios" className="nav-link">Ver Usuarios</NavLink>

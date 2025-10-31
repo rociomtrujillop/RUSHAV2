@@ -1,28 +1,19 @@
-/* src/styles.css (Reemplazo Completo) */
-
-/* --- 1. Variables de Branding (Sobreescribimos Bootstrap) --- */
 :root {
-  /* Tu color rojo principal */
   --bs-primary: #b23a48;
   --bs-primary-rgb: 178, 58, 72;
   
-  /* Hacemos que los botones "danger" usen tu color */
   --bs-danger: #b23a48;
   --bs-danger-rgb: 178, 58, 72;
   
   --bs-link-color: #b23a48;
   --bs-link-hover-color: #8e2d39;
 
-  /* Seteamos la fuente base de Bootstrap */
   --bs-font-sans-serif: system-ui, Avenir, Helvetica, Arial, sans-serif;
   --bs-body-color: #333;
   --bs-body-bg: #f5f5f5;
 }
 
-/* --- 2. Estilos de Botones Personalizados --- */
-/* Esto asegura que .btn-primary y .btn-danger 
-  usen tu color y tengan buen contraste 
-*/
+
 .btn-primary, .btn-danger {
   --bs-btn-color: #fff;
   --bs-btn-bg: #b23a48;
@@ -36,8 +27,6 @@
   --bs-btn-disabled-border-color: #b23a48;
 }
 
-/* --- 3. Tus Fondos de Hero --- */
-/* Mantenemos tus imágenes de fondo */
 .hero {
   background: url("/img/hero.jpg") center center/cover no-repeat;
   color: white;
@@ -50,13 +39,11 @@
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-/* --- 4. Ajustes Específicos de Componentes --- */
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
 }
 
-/* Ajuste para las miniaturas de detalle */
 .miniaturas img {
   width: 50px;
   height: 50px;
@@ -76,7 +63,6 @@
   box-shadow: 0 0 5px var(--bs-primary);
 }
 
-/* Estilos del Admin Layout */
 .admin-layout {
   display: flex;
   min-height: 100vh;
@@ -153,28 +139,22 @@ input[type="number"] {
   font-weight: 500;
 }
 
-/* --- 6. Estilos del Footer (CORREGIDO) --- */
 
-/* 1. Estilo para los LINKS (Nosotros, Contacto) */
 footer a {
-  font-size: 1.1rem;  /* Tamaño de fuente grande */
+  font-size: 1.1rem;  
   font-weight: 500;
-  /* Este es el color "gris" del header */
   color: rgba(255, 255, 255, 0.55) !important; 
   text-decoration: none;
   transition: color 0.2s;
 }
 
-/* 2. Estilo HOVER para los links */
 footer a:hover {
-   /* Este es el color "gris claro" del header al pasar el mouse */
    color: rgba(255, 255, 255, 0.75) !important;
 }
 
-/* 3. Estilo para el PÁRRAFO (Copyright) */
 footer p {
-  font-size: 1.1rem; /* Mismo tamaño de fuente */
-  font-weight: 500; /* Mismo peso de fuente */
-  color: #FFFFFF !important; /* Color blanco brillante */
-  margin-bottom: 0; /* Para alinear verticalmente */
+  font-size: 1.1rem; 
+  font-weight: 500; 
+  color: #FFFFFF !important; 
+  margin-bottom: 0;
 }

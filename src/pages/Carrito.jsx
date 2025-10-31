@@ -53,7 +53,6 @@ function Carrito() {
     <Container className="py-4">
       <h1>Mi carrito de compras</h1>
       <Row className="mt-4">
-        {/* Columna de Items */}
         <Col md={8}>
           {items.length === 0 ? (
             <Alert variant="info">

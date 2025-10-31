@@ -1,5 +1,3 @@
-// src/pages/Detalle.jsx (CORREGIDO - Sintaxis de returns revisada)
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Image, Button, Form, Spinner, Alert, Card } from 'react-bootstrap'; 
@@ -40,10 +38,8 @@ function agregarAlCarrito(producto, cantidad, imagenPrincipal) {
     localStorage.setItem("carrito", JSON.stringify(carrito));
     alert(`${cantidad} producto(s) añadido(s) al carrito`);
 }
-// --- Fin funciones auxiliares ---
 
 function Detalle() {
-  // Estados
   const [searchParams] = useSearchParams();
   const productoId = searchParams.get('id');
   const [producto, setProducto] = useState(null);
@@ -53,10 +49,8 @@ function Detalle() {
   const [imagenPrincipal, setImagenPrincipal] = useState('');
   const [cantidad, setCantidad] = useState(1);
 
-  // --- Efecto Cargar Producto Principal ---
   useEffect(() => {
     let isMounted = true;
-    // Resetear estados al inicio o cambio de ID
     setLoading(true); 
     setError(null); 
     setProducto(null); 
@@ -98,7 +92,6 @@ function Detalle() {
     return () => { isMounted = false; }; 
   }, [productoId]); 
 
-  // --- Efecto Cargar Relacionados ---
   useEffect(() => {
     if (!producto || !producto.genero) {
         setRelacionados([]); 
@@ -123,17 +116,10 @@ function Detalle() {
     return () => { isMounted = false; }; 
   }, [producto]); // Depende solo de 'producto'
 
-  // --- Handler Botón ---
   const handleAgregarClick = () => {
       agregarAlCarrito(producto, cantidad, imagenPrincipal);
   };
 
-  // ===========================================
-  // ---           RENDERIZADO               ---
-  // ===========================================
-
-  // --- 1. Estado de Carga ---
-  // Si está cargando, muestra Spinner y NADA MÁS.
   if (loading) { 
     return (
         <Container className="text-center p-5">
@@ -142,8 +128,7 @@ function Detalle() {
     ); // Punto y coma opcional aquí
   }
 
-  // --- 2. Estado de Error o Producto No Encontrado ---
-  // Si hubo error O si (después de cargar) el producto sigue siendo null, muestra error.
+ 
   if (error || !producto) { 
     // Asegúrate que el return aquí sea sintácticamente correcto
     return ( 
@@ -151,22 +136,15 @@ function Detalle() {
         <Alert variant="danger">{error || 'Producto no encontrado o datos inválidos.'}</Alert>
         <Button as={Link} to="/productos" variant="primary">Volver a productos</Button>
       </Container>
-    ); // Punto y coma opcional aquí
+    ); 
   }
-
-  // --- 3. Renderizado Exitoso ---
-  // Si llegamos aquí, loading es false, error es null, y producto TIENE datos.
-  
-  // Calculamos imagenesArray aquí, ahora es seguro.
+ 
   const imagenesArray = producto.imagenes ? producto.imagenes.split(',') : [];
 
-  // JSX Principal
   return (
     <Container id="detalle" className="py-4">
       <Row>
-        {/* Columna Imágenes */}
         <Col md={6} className="mb-3 mb-md-0">
-          {/* Muestra imagen principal */}
           {imagenPrincipal && 
             <Image 
               id="imagen-principal" 
@@ -177,7 +155,6 @@ function Detalle() {
               className="mb-2"
             /> 
           }
-          {/* Muestra Miniaturas */}
           <div className="miniaturas d-flex flex-wrap gap-2">
             {imagenesArray.map((img, index) => {
               const imgSrc = `/${img.trim()}`; 
@@ -196,7 +173,6 @@ function Detalle() {
           </div>
         </Col>
         
-        {/* Columna Info */}
         <Col md={6}>
           <h1>{producto.nombre}</h1>
           <p className="display-6 text-primary">
@@ -204,7 +180,6 @@ function Detalle() {
           </p>
           <p>{producto.descripcion}</p>
           
-          {/* Formulario Cantidad */}
           <Form.Group as={Row} className="align-items-center my-3">
             <Form.Label column sm="3" xs="4">Cantidad:</Form.Label>
             <Col sm="9" xs="8">
@@ -219,14 +194,12 @@ function Detalle() {
             </Col>
           </Form.Group>
           
-          {/* Botón Añadir */}
           <Button variant="primary" size="lg" className="w-100" onClick={handleAgregarClick}>
             Añadir al carrito
           </Button>
         </Col>
       </Row>
 
-      {/* Productos Relacionados */}
       <div className="productos-relacionados-container mt-5">
         <h2>Productos relacionados</h2>
         <Row className="mt-3">
@@ -253,13 +226,12 @@ function Detalle() {
               </Col>
             )) 
           ) : (
-            // Mensaje si no hay relacionados (solo si no estamos cargando principal)
             !loading && <Col><p>No hay productos relacionados para mostrar.</p></Col> 
           )}
         </Row>
       </div>
     </Container>
-  ); // Cierre del return principal
-} // Cierre del componente Detalle
+  ); 
+} 
 
 export default Detalle;

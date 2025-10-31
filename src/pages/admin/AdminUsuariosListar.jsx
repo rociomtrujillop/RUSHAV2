@@ -63,14 +63,12 @@ function AdminUsuariosListar() {
       return ( <Container className="p-5"><Alert variant="danger">Error al cargar usuarios: {error}</Alert><Button onClick={fetchUsuarios} variant="warning">Reintentar Carga</Button></Container> );
   }
 
-  // 2. MODIFICAMOS EL RETURN PARA USAR Container Y Row
   return (
-    <Container> {/* Usamos Container para alinear todo */}
+    <Container>
       <h2>Gestión de Usuarios</h2>
       
-      {/* 3. CAMBIAMOS EL LAYOUT DE BÚSQUEDA */}
       <Row className="mb-3 gy-2 align-items-center">
-        <Col md={4}> {/* La barra de búsqueda ahora está en la columna central */}
+        <Col md={4}> 
           <Form.Control 
             type="text" 
             placeholder="Buscar por nombre o email..." 

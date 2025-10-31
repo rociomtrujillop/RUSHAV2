@@ -1,5 +1,3 @@
-// src/components/Header.jsx (Revertido a Izquierda + Control por CSS)
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { Navbar, Nav, Container, Button, Badge } from 'react-bootstrap';
@@ -37,7 +35,6 @@ function Header() {
   return (
     <Navbar bg="dark" variant="dark" expand="lg" sticky="top" collapseOnSelect>
       <Container>
-        {/* Vuelve a usar la clase "logo" del styles.css */}
         <Navbar.Brand as={Link} to="/" className="logo">RUSHAV</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">

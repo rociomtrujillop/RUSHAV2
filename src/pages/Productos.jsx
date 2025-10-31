@@ -1,4 +1,3 @@
-// src/pages/Productos.jsx (ARREGLADO FILTRO DE GÉNERO)
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Form, Breadcrumb } from 'react-bootstrap';
@@ -6,7 +5,6 @@ import { Container, Row, Col, Card, Button, Spinner, Alert, Form, Breadcrumb } f
 const API_URL_PRODUCTOS = 'http://localhost:8080/api/productos';
 const API_URL_CATEGORIAS = 'http://localhost:8080/api/categorias';
 
-// --- (Funciones auxiliares formatearPrecio y agregarAlCarrito - sin cambios) ---
 function formatearPrecio(valor) {
     const num = Number(valor);
     return isNaN(num) ? '$?' : num.toLocaleString("es-CL");
@@ -18,7 +16,6 @@ function agregarAlCarrito(producto) {
     if (existente) {
         existente.cantidad = (existente.cantidad || 1) + 1;
     } else {
-        // Objeto simple para el carrito
         const productoParaCarrito = {
             id: producto.id,
             nombre: producto.nombre || 'Producto',
@@ -29,10 +26,9 @@ function agregarAlCarrito(producto) {
         carrito.push(productoParaCarrito);
     }
     localStorage.setItem("carrito", JSON.stringify(carrito));
-    window.dispatchEvent(new Event('cartUpdated')); // Dispara evento para actualizar header
+    window.dispatchEvent(new Event('cartUpdated')); 
     alert("Producto añadido al carrito");
 }
-// --- Fin Funciones auxiliares ---
 
 
 function Productos() {
@@ -83,10 +79,8 @@ function Productos() {
         setSearchTermInput(searchTermParam || '');
         return () => { isMounted = false; };
         
-    // --- 2. AÑADIR generoParam A LAS DEPENDENCIAS ---
     }, [searchTermParam, categoriaIdParam, generoParam]); 
 
-    // --- (Handlers para Filtros - sin cambios) ---
     const handleSelectCategoria = (categoria) => {
         const currentParams = Object.fromEntries(searchParams.entries());
         setSearchParams({ ...currentParams, categoriaId: categoria.id.toString() }, { replace: true });
@@ -134,7 +128,6 @@ function Productos() {
         return matchesCategory && matchesSearch && matchesGenero;
     });
 
-    // --- (Renderizado JSX - sin cambios) ---
     if (loading && productos.length === 0) { 
         return <Container className="text-center p-5"><Spinner animation="border" variant="primary" /></Container>;
     }
@@ -142,7 +135,6 @@ function Productos() {
         return <Container className="p-5"><Alert variant="danger">{error}</Alert></Container>;
     }
 
-    // Define un título dinámico
     let titulo = "Todos los Productos";
     if (categoriaSeleccionadaObj) {
         titulo = `Productos de ${categoriaSeleccionadaObj.nombre}`;

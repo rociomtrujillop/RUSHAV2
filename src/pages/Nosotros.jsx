@@ -1,5 +1,3 @@
-// src/pages/Nosotros.jsx
-
 import React from 'react';
 import { Container, Row, Col, Image, Card } from 'react-bootstrap';
 

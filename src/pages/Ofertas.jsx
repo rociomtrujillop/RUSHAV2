@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Breadcrumb } from 'react-bootstrap';
 
 const API_URL_PRODUCTOS = 'http://localhost:8080/api/productos';
-// Define el precio máximo para ser considerado oferta
 const PRECIO_MAXIMO_OFERTA = 17000;
 
 function formatearPrecio(valor) {
@@ -75,9 +74,7 @@ function Ofertas() {
 
             <h1>Productos en Oferta!!! (Menos de ${formatearPrecio(PRECIO_MAXIMO_OFERTA)})</h1>
 
-            {/* Grid de Productos en Oferta */}
             <Row className="mt-4">
-                {/* Mensaje si no hay ofertas */}
                 {productosEnOferta.length === 0 && (
                     <Col>
                         <Alert variant="info">
@@ -86,10 +83,8 @@ function Ofertas() {
                     </Col>
                 )}
 
-                {/* Mapeo usa 'productosEnOferta' */}
                 {productosEnOferta.map(p => (
                     <Col key={p.id} sm={6} md={4} lg={3} className="mb-4">
-                        {/* Reutiliza la clase .producto-card */}
                         <Card className="h-100 producto-card">
                             <Card.Img
                                 variant="top"
