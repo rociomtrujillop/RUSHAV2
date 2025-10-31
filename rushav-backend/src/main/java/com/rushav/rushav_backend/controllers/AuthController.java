@@ -51,14 +51,12 @@ public class AuthController {
         Usuario u = opt.get();
         
         if (passwordEncoder.matches(req.getPassword(), u.getPassword())) {
-            // Si coinciden: Éxito
-            u.setPassword(null); // No devolver la contraseña (aunque esté encriptada)
+            u.setPassword(null); 
             LoginResponse r = new LoginResponse();
             r.setMensaje("OK");
             r.setUsuarios(u);
             return ResponseEntity.ok(r);
         } else {
-            // Si NO coinciden: Error
             LoginResponse r = new LoginResponse();
             r.setMensaje("Credenciales incorrectas");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(r);

@@ -18,7 +18,6 @@ public class CategoriaServiceImpl implements CategoriaService {
         this.repo = repo;
     }
 
-    // --- Tus otros métodos (crear, listar, etc.) irían aquí ---
     @Override
     public List<Categoria> listar() {
         return repo.findAll();
@@ -26,7 +25,6 @@ public class CategoriaServiceImpl implements CategoriaService {
     
     @Override
     public List<Categoria> listarActivas() {
-        // (Asumiendo que tienes este método en tu repo)
         return repo.findByActivaTrue();
     }
 
@@ -61,35 +59,28 @@ public class CategoriaServiceImpl implements CategoriaService {
     
     @Override
     public boolean existePorNombre(String nombre) {
-        // (Asumiendo que tienes esto en tu repo)
         return repo.existsByNombre(nombre); 
     }
     
     @Override
     public List<Categoria> listarPorTipo(String tipo) {
-         // (Asumiendo que tienes esto en tu repo)
         return repo.findByTipo(tipo);
     }
 
 
-    // --- MÉTODO ELIMINAR (MODIFICADO) ---
     @Override
     public void eliminar(Long id) {
         try {
-            // Intenta eliminar
             repo.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            // Si falla, es porque está en uso (Foreign Key)
             throw new RuntimeException("No se puede eliminar la categoría porque está siendo usada por uno o más productos.");
         } catch (Exception e) {
-            // Otros errores
             throw new RuntimeException("Error al eliminar la categoría.");
         }
     }
 
     @Override
     public Optional<Categoria> buscarPorNombre(String nombre) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorNombre'");
     }
 }

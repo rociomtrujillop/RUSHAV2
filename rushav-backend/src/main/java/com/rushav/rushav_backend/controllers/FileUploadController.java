@@ -40,14 +40,12 @@ public class FileUploadController {
     public ResponseEntity<FileUploadResponse> subirArchivo(
             @Parameter(description = "Archivo de imagen a subir") @RequestParam("archivo") MultipartFile archivo) {
         try {
-            // Validar tipo de archivo
             String contentType = archivo.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
                 return ResponseEntity.badRequest()
                     .body(new FileUploadResponse(null, null, "Solo se permiten archivos de imagen"));
             }
 
-            // Validar tamaño
             if (archivo.getSize() > 5 * 1024 * 1024) { // 5MB
                 return ResponseEntity.badRequest()
                     .body(new FileUploadResponse(null, null, "El archivo no puede ser mayor a 5MB"));
@@ -104,7 +102,6 @@ public class FileUploadController {
                 return ResponseEntity.notFound().build();
             }
 
-            // Determinar el tipo de contenido basado en la extensión del archivo
             String contentType = determinarContentType(nombreArchivo);
 
             return ResponseEntity.ok()

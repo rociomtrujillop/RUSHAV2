@@ -25,18 +25,15 @@ public class ProductoServiceImplTest {
 
     @Test
     public void testProductosConStockBajo() {
-        // Configuración simple
         Producto producto = new Producto();
         producto.setId(1L);
         producto.setNombre("Test Product");
-        producto.setStock(3); // Stock bajo
+        producto.setStock(3);
 
         when(productoRepository.findByStockLessThan(5)).thenReturn(Arrays.asList(producto));
 
-        // Ejecutar
         List<Producto> resultado = productoService.productosConStockBajo();
 
-        // Verificar
         assertEquals(1, resultado.size());
         assertEquals("Test Product", resultado.get(0).getNombre());
     }

@@ -122,8 +122,6 @@ public class ProductoController {
         return ResponseEntity.noContent().build();
     }
 
-    // ========== MÉTODOS PARA IMÁGENES ==========
-
     @Operation(summary = "Agregar imágenes a producto", description = "Sube y asocia imágenes a un producto existente")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Imágenes agregadas exitosamente"),
@@ -144,12 +142,11 @@ public class ProductoController {
             Producto producto = productoOpt.get();
             String imagenesActuales = producto.getImagenes();
             
-            // Subir nuevas imágenes
             List<String> nuevasImagenes = new ArrayList<>();
             for (MultipartFile archivo : archivos) {
                 try {
                     if (archivo.getContentType() == null || !archivo.getContentType().startsWith("image/")) {
-                        continue; // Saltar archivos que no son imágenes
+                        continue; 
                     }
                     
                     String nombreArchivo = fileStorageService.almacenarArchivo(archivo);
