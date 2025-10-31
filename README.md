@@ -16,7 +16,7 @@ La aplicación está dividida en dos componentes principales:
 El proyecto sigue una arquitectura de API REST desacoplada:
 
 * **Backend (API):** Construido con **Spring Boot**, expone una API REST para manejar toda la lógica de negocio y la persistencia de datos. La seguridad se gestiona con **Spring Security** (usando `HttpBasic` y autenticación basada en roles).
-* **Frontend (SPA):** Construido con **React (Vite)**, consume la API del backend. [cite_start]El estado de autenticación del usuario se maneja globalmente usando **React Context API** (`AuthContext`) [cite: 26-52].
+* **Frontend (SPA):** Construido con **React (Vite)**, consume la API del backend. El estado de autenticación del usuario se maneja globalmente usando **React Context API** (`AuthContext`).
 * **Base de Datos:** Se utiliza **MySQL** como motor de base de datos relacional, gestionado a través de **Spring Data JPA**.
 
 ---
@@ -33,10 +33,10 @@ El proyecto sigue una arquitectura de API REST desacoplada:
 | | Mockito | Pruebas unitarias de servicios |
 | **Frontend** | React 19 | Librería principal de UI |
 | | Vite | Herramienta de construcción y servidor de desarrollo |
-| | React Router | [cite_start]Enrutamiento de la SPA (Cliente y Admin) [cite: 729-745] |
-| | React Bootstrap | [cite_start]Framework de componentes de UI [cite: 14-25, 58-82, 100-108] |
-| | Context API | [cite_start]Manejo de estado global (`AuthContext`) [cite: 26-52] |
-| | Vitest | [cite_start]Pruebas unitarias de componentes (ej. `Contacto.test.jsx` [cite: 437-445]) |
+| | React Router | Enrutamiento de la SPA (Cliente y Admin) |
+| | React Bootstrap | Framework de componentes de UI |
+| | Context API | Manejo de estado global (`AuthContext`) |
+| | Vitest | Pruebas unitarias de componentes (ej. `Contacto.test.jsx` |
 | **Base de Datos** | MySQL | Almacenamiento de datos |
 | **Documentación** | Swagger (Springdoc) | Documentación interactiva de la API |
 
