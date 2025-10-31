@@ -33,29 +33,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Deshabilita CSRF
-            .cors(withDefaults()) // Habilita CORS usando tu Bean 'corsConfigurationSource'
+            .csrf(csrf -> csrf.disable()) 
+            .cors(withDefaults()) 
             
             .authorizeHttpRequests(authz -> authz
 
-                // --- 1. RUTAS PÚBLICAS (Cliente y Swagger) ---
-                // Estas rutas son visibles para CUALQUIERA, sin autenticación.
                 .requestMatchers(
                     "/", "/index.html", "/static/**", "/favicon.ico",
                     "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
                     "/api-docs/**", "/swagger-config/**", "/swagger-resources/**", "/webjars/**"
                 ).permitAll()
                 
-                // Endpoints de API públicos (Login, Registro, y ver productos/categorías)
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Registro de clientes
-                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll() // <-- ARREGLO PARA RUTAS PÚBLICAS
-                .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll() // <-- ARREGLO PARA RUTAS PÚBLICAS
+                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() 
+                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll() 
+                .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll() 
                 .requestMatchers(HttpMethod.GET, "/api/archivos/descargar/**").permitAll()
 
-                // --- 2. RUTAS PROTEGIDAS (Admin) ---
-                // Todas las demás rutas que no sean las de arriba, requerirán autenticación.
-                // Spring Security usará tu UserDetailsService (UsuarioServiceImpl) para validarlas.
+                
                 .requestMatchers("/api/dashboard/**").hasAnyAuthority("admin", "super-admin")
                 .requestMatchers(HttpMethod.GET, "/api/usuarios/**").hasAnyAuthority("admin", "super-admin")
                 .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").hasAnyAuthority("admin", "super-admin")
@@ -71,14 +66,9 @@ public class SecurityConfig {
 
                 .requestMatchers("/api/archivos/subir/**", "/api/archivos/eliminar/**").hasAnyAuthority("admin", "super-admin")
 
-                // --- 3. CUALQUIER OTRA RUTA ---
-                // Si no coincide con nada de lo anterior, deniégalo.
                 .anyRequest().denyAll() 
             )
             
-            // --- 4. HABILITA HTTP BASIC ---
-            // Esto activa el filtro que usará tu UserDetailsService (UsuarioServiceImpl)
-            // para validar las rutas protegidas.
             .httpBasic(withDefaults()); 
 
         return http.build();

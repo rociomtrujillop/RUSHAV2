@@ -43,23 +43,18 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         return repo.findByEmail(email);
     }
 
-    // --- MÉTODO CREAR (MODIFICADO) ---
     @Override
     public Usuario crear(Usuario u) {
         if (u.getRol() == null) u.setRol("cliente");
         u.setPassword(passwordEncoder.encode(u.getPassword()));
         
         try {
-            // Intenta guardar el usuario
             return repo.save(u);
         } catch (DataIntegrityViolationException e) {
-            // Si falla, es probable que sea por el email duplicado
-            // (Asumiendo que tienes una restricción UNIQUE en el email en tu BD)
             throw new RuntimeException("El email '" + u.getEmail() + "' ya está registrado.");
         }
     }
 
-    // --- MÉTODO ACTUALIZAR (MODIFICADO) ---
     @Override
     public Usuario actualizar(Long id, Usuario usuarioActualizado) {
         return repo.findById(id).map(usuarioExistente -> {
@@ -76,10 +71,8 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
             }
             
             try {
-                // Intenta guardar
                 return repo.save(usuarioExistente);
             } catch (DataIntegrityViolationException e) {
-                // Atrapa el error si el *nuevo* email ya existe
                 throw new RuntimeException("El email '" + usuarioActualizado.getEmail() + "' ya está registrado.");
             }
 
@@ -96,7 +89,6 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         return repo.count();
     }
 
-    // --- (loadUserByUsername se queda igual que antes) ---
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = repo.findByEmail(email)
