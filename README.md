@@ -65,10 +65,10 @@ Este proyecto está dividido en dos repositorios separados. Sigue los pasos para
     ```
 3.  **Configuración:** Abre el archivo `src/main/resources/application.properties`.
     * Asegúrate de que `spring.datasource.username` y `spring.datasource.password` coincidan con tu configuración local de MySQL.
-    * **¡Importante!** El proyecto está configurado con `spring.jpa.hibernate.ddl-auto=create-drop` y `spring.sql.init.mode=always`. Esto significa que **la base de datos se borrará y se volverá a crear con datos de prueba (`data.sql`) cada vez que inicies el backend**.
+    * **¡Importante!** La primera vez que se ejecute el proyecto debe estar configurado con `spring.jpa.hibernate.ddl-auto=create-drop` y `spring.sql.init.mode=always`. Esto para que **la base de datos se vuelva crear con datos de prueba (`data.sql`) al inciar el backend** Despues de esto la configuración debe volver a **`spring.jpa.hibernate.ddl-auto=create-drop` y `spring.sql.init.mode=always`.**
 
 **Ejecución:**
-1.  Abre el proyecto con tu IDE (IntelliJ, Eclipse, VSCode).
+1.  Abre el proyecto con tu ID.
 2.  Ejecuta la clase principal `RushavBackendApplication.java`.
 3.  El backend se estará ejecutando en `http://localhost:8080`.
 
