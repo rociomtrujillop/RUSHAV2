@@ -65,7 +65,7 @@ Este proyecto está dividido en dos repositorios separados. Sigue los pasos para
     ```
 3.  **Configuración:** Abre el archivo `src/main/resources/application.properties`.
     * Asegúrate de que `spring.datasource.username` y `spring.datasource.password` coincidan con tu configuración local de MySQL.
-    * **¡Importante!** La primera vez que se ejecute el proyecto debe estar configurado con `spring.jpa.hibernate.ddl-auto=create-drop` y `spring.sql.init.mode=always`. Esto para que **la base de datos se vuelva crear con datos de prueba (`data.sql`) al inciar el backend** Despues de esto la configuración debe volver a **`spring.jpa.hibernate.ddl-auto=update` y `spring.sql.init.mode=embedded`.**
+    * **¡Importante!** La primera vez que se ejecute el proyecto debe estar configurado con `spring.jpa.hibernate.ddl-auto=create-drop` y `spring.sql.init.mode=always`. Esto para que **la base de datos se vuelva crear con datos de prueba (`data.sql`) al inciar el backend** Despues de esto la configuración debe volver a **`spring.jpa.hibernate.ddl-auto=update` y `spring.sql.init.mode=never`.**
 
 **Ejecución:**
 1.  Abre el proyecto con tu ID.
