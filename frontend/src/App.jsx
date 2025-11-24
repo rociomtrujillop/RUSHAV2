@@ -22,6 +22,7 @@ import PagoExitoso from './pages/PagoExitoso';
 import PagoError from './pages/PagoError';       
 
 // --- VISTAS DEL ADMIN ---
+import AdminPedidosListar from './pages/admin/AdminPedidosListar';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsuariosListar from './pages/admin/AdminUsuariosListar';
@@ -79,6 +80,7 @@ function App() {
           <Route path="categorias" element={<AdminCategoriasListar />} /> 
           <Route path="categorias/crear" element={<AdminCategoriasForm />} />
           <Route path="categorias/editar/:id" element={<AdminCategoriasForm />} />
+          <Route path="ventas" element={<AdminPedidosListar />} />
         </Route>
       </Routes>
     </BrowserRouter>

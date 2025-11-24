@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // (Función login)
+  // (Función login CORREGIDA)
   const login = async (email, password) => {
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -44,17 +44,25 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email: email, password: password }),
       });
       const data = await response.json();
+      
       if (!response.ok) {
         throw new Error(data.mensaje || "Credenciales incorrectas");
       }
-      if (data && data.usuarios && data.usuarios.id) {
-        const basicToken = "Basic " + btoa(`${email}:${password}`);
-        localStorage.setItem(USER_KEY, JSON.stringify(data.usuarios));
-        localStorage.setItem(AUTH_TOKEN_KEY, basicToken);
-        setCurrentUser(data.usuarios);
-        setAuthToken(basicToken);
-        return data.usuarios;
+      
+      // --- CORRECCIÓN AQUÍ: Usamos 'usuario' (singular) ---
+      if (data && data.usuario && data.usuario.id && data.token) {
+        
+        // Guardamos el token que viene del backend
+        const token = "Bearer " + data.token;
+        
+        localStorage.setItem(USER_KEY, JSON.stringify(data.usuario)); // Singular
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+        
+        setCurrentUser(data.usuario); // Singular
+        setAuthToken(token);
+        return data.usuario; // Singular
       } else {
+        console.error("Estructura recibida:", data);
         throw new Error("Respuesta de login inválida.");
       }
     } catch (error) {
@@ -77,7 +85,7 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // --- fetchProtegido (para JSON) 
+  // --- fetchProtegido (para JSON) ---
   const fetchProtegido = useCallback(async (url, options = {}) => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) {
@@ -92,16 +100,18 @@ export function AuthProvider({ children }) {
     const response = await fetch(`${API_URL}${url}`, { ...options, headers });
 
     if (!response.ok) {
-      const errorBody = await response.text(); // Lee el error como texto
-      // Esto mostrará "El email ya está registrado"
+      const errorBody = await response.text(); 
+      if (response.status === 401 || response.status === 403) {
+          logout();
+          throw new Error("Sesión expirada.");
+      }
       throw new Error(errorBody || `Error ${response.status}`);
     }
     
-    if (response.status === 204) { // No Content (para DELETE)
+    if (response.status === 204) { 
         return { ok: true };
     }
     
-    // Si todo está OK, leemos el JSON
     return response.json();
   }, [logout]);
 
@@ -117,10 +127,13 @@ export function AuthProvider({ children }) {
 
     if (!response.ok) {
       const errorBody = await response.text();
+      if (response.status === 401 || response.status === 403) {
+          logout();
+          throw new Error("Sesión expirada.");
+      }
       throw new Error(errorBody || `Error ${response.status}`);
     }
     
-    // <-- CAMBIO 2: LEEMOS LA RESPUESTA COMO TEXTO (LA URL)
     return response.text();
   }, [logout]);
 
