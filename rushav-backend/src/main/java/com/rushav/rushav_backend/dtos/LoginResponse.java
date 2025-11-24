@@ -11,6 +11,9 @@ public class LoginResponse {
     
     @Schema(description = "Datos del usuario autenticado")
     private Usuario usuario;
+
+    @Schema(description = "Token de autenticación JWT", example = "eyJhbGciOiJIUzI1NiJ9...")
+    private String token;
     
     public String getMensaje() {
         return mensaje;
@@ -18,10 +21,19 @@ public class LoginResponse {
     public void setMensaje(String mensaje) {
         this.mensaje = mensaje;
     }
-    public Usuario getUsuarios() {
+    
+    public Usuario getUsuario() {
         return usuario;
     }
-    public void setUsuarios(Usuario usuario) {
+    public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    // --- Getters y Setters del Token ---
+    public String getToken() {
+        return token;
+    }
+    public void setToken(String token) {
+        this.token = token;
     }
 }
