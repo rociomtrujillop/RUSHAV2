@@ -1,5 +1,3 @@
-// src/pages/Checkout.jsx (CORREGIDO)
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { regiones } from '../data/regiones.js'; 
@@ -18,9 +16,7 @@ function Checkout() {
   const [comuna, setComuna] = useState(''); 
   const [comunas, setComunas] = useState([]); 
 
-  // --- useEffect 1: Cargar carrito y rellenar datos (CORREGIDO) ---
   useEffect(() => {
-    // Carga carrito (sin cambios)
     try {
         const carritoGuardado = JSON.parse(localStorage.getItem("carrito")) || [];
         setItems(carritoGuardado);
@@ -28,12 +24,9 @@ function Checkout() {
         setTotal(totalCalculado);
     } catch (e) { console.error("Error cargando carrito:", e); }
 
-    // Rellena datos del usuario (LÓGICA CORREGIDA)
     try {
-        // 1. Leemos el objeto de usuario (que AHORA SÍ es el usuario)
         const loggedUser = JSON.parse(localStorage.getItem("usuario"));
         
-        // 2. Verificamos que 'loggedUser' exista y tenga un ID
         if (loggedUser && loggedUser.id) { 
             
             if (loggedUser.nombre) { 
@@ -68,24 +61,49 @@ function Checkout() {
     }
   }, [region, comuna]); // Depende de AMBOS
   
-  // --- handleSubmit (sin cambios) ---
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!nombre || !apellidos || !email || !calle || !region || !comuna) {
-      alert("Por favor, completa todos los campos requeridos (*).");
-      return;
-    }
+  // ... imports ...
+  const API_URL_PEDIDOS = 'http://localhost:8080/api/pedidos'; // Nueva URL
 
-    const pedido = { 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // ... (validaciones previas) ...
+
+    // Construimos el objeto tal cual lo espera el DTO Java
+    const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
+    
+    const pedidoRequest = { 
       cliente: { nombre, apellidos, email },
       direccion: { calle, departamento, region, comuna },
-      items: items,
+      items: items.map(i => ({ id: i.id, cantidad: i.cantidad, precio: i.precio })), // Mapeamos solo lo necesario
       total: total,
-      fecha: new Date().toISOString()
+      usuarioId: usuarioGuardado ? usuarioGuardado.id : null // Enviamos ID si existe
     };
-    
-    localStorage.removeItem("carrito");
-    navigate('/pago-exitoso', { state: { pedido } });
+
+    try {
+        const response = await fetch(API_URL_PEDIDOS, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pedidoRequest)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(errorData);
+        }
+
+        const pedidoCreado = await response.json(); // Recibimos la boleta real con ID
+        
+        localStorage.removeItem("carrito");
+        // Disparamos evento para actualizar el contador del header a 0
+        window.dispatchEvent(new Event('cartUpdated')); 
+        
+        // Pasamos el pedido real a la página de éxito
+        navigate('/pago-exitoso', { state: { pedido: pedidoRequest, idBoleta: pedidoCreado.id } });
+
+    } catch (err) {
+        alert("Error al procesar la compra: " + err.message);
+        navigate('/pago-error');
+    }
   };
 
   // --- formatearPrecio (sin cambios) ---

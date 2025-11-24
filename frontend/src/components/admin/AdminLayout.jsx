@@ -27,6 +27,8 @@ function AdminLayout() {
           <h3 className="h6 mt-3">Categorías</h3>
           <NavLink to="/admin/categorias" className="nav-link">Ver Categorías</NavLink>
           <NavLink to="/admin/categorias/crear" className="nav-link">Crear Categoría</NavLink>
+          <h3 className="h6 mt-3">Ventas</h3>
+          <NavLink to="/admin/ventas" className="nav-link">Ver Historial de Ventas</NavLink>
 
           <Button 
             variant="danger" 
